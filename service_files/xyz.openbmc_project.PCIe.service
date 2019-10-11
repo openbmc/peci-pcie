@@ -5,6 +5,7 @@ Description=Service to get PCIe info over PECI
 Restart=always
 ExecStart=/usr/bin/peci-pcie
 Type=simple
+Nice=19
 
 [Install]
 WantedBy=multi-user.target
