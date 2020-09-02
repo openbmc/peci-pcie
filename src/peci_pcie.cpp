@@ -120,7 +120,7 @@ static void getCPUBusNums(std::vector<CPUInfo>& cpuInfo)
                     size_t busNum = cpuBusNum1 & 0xFF;
                     cpu.cpuBusNums.insert(busNum);
                     // Shift right by one byte
-                    cpuBusNum >>= 8;
+                    cpuBusNum1 >>= 8;
                 }
                 cpu.skipCpuBuses = true;
             }
