@@ -19,6 +19,8 @@
 #include "pciDeviceClass.hpp"
 #include "pciVendors.hpp"
 
+#include <boost/asio/io_service.hpp>
+#include <boost/asio/steady_timer.hpp>
 #include <boost/container/flat_map.hpp>
 #include <boost/container/flat_set.hpp>
 #include <sdbusplus/asio/object_server.hpp>
