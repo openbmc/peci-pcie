@@ -51,6 +51,12 @@ static constexpr char const* subsystemVendorIdName = "SubsystemVendorId";
 } // namespace function
 } // namespace peci_pcie
 
+enum class resCode
+{
+    resOk,
+    resErr
+};
+
 struct CPUInfo
 {
     size_t addr;
@@ -61,6 +67,7 @@ struct CPUInfo
 // PECI Client Address Map
 static void getClientAddrMap(std::vector<CPUInfo>& cpuInfo)
 {
+    cpuInfo.clear();
     for (size_t i = MIN_CLIENT_ADDR; i <= MAX_CLIENT_ADDR; i++)
     {
         if (peci_Ping(i) == PECI_CC_SUCCESS)
@@ -71,7 +78,7 @@ static void getClientAddrMap(std::vector<CPUInfo>& cpuInfo)
 }
 
 // Get CPU PCIe Bus Numbers
-static void getCPUBusNums(std::vector<CPUInfo>& cpuInfo)
+static resCode getCPUBusNums(std::vector<CPUInfo>& cpuInfo)
 {
     for (CPUInfo& cpu : cpuInfo)
     {
@@ -81,7 +88,7 @@ static void getCPUBusNums(std::vector<CPUInfo>& cpuInfo)
         if (peci_GetCPUID(cpu.addr, &model, &stepping, &cc) != PECI_CC_SUCCESS)
         {
             std::cerr << "Cannot get CPUID!\n";
-            continue;
+            return resCode::resErr;
         }
 
         switch (model)
@@ -95,14 +102,14 @@ static void getCPUBusNums(std::vector<CPUInfo>& cpuInfo)
                                           (uint8_t*)&cpuBusNum,
                                           &cc) != PECI_CC_SUCCESS)
                 {
-                    continue;
+                    return resCode::resErr;
                 }
                 uint32_t cpuBusNum1 = 0;
                 if (peci_RdPCIConfigLocal(cpu.addr, 0, 8, 2, 0xD0, 4,
                                           (uint8_t*)&cpuBusNum1,
                                           &cc) != PECI_CC_SUCCESS)
                 {
-                    continue;
+                    return resCode::resErr;
                 }
 
                 // Add the CPU bus numbers to the set for this CPU
@@ -126,6 +133,7 @@ static void getCPUBusNums(std::vector<CPUInfo>& cpuInfo)
             }
         }
     }
+    return resCode::resOk;
 }
 
 static bool isPECIAvailable(void)
@@ -140,10 +148,10 @@ static bool isPECIAvailable(void)
     return false;
 }
 
-static bool getDataFromPCIeConfig(const int& clientAddr, const int& bus,
-                                  const int& dev, const int& func,
-                                  const int& offset, const int& size,
-                                  uint32_t& pciData)
+static resCode getDataFromPCIeConfig(const int& clientAddr, const int& bus,
+                                     const int& dev, const int& func,
+                                     const int& offset, const int& size,
+                                     uint32_t& pciData)
 {
     // PECI RdPCIConfig() currently only supports 4 byte reads, so adjust
     // the offset and size to get the right data
@@ -152,22 +160,25 @@ static bool getDataFromPCIeConfig(const int& clientAddr, const int& bus,
     int pciOffset = offset - mod;
     if (mod + size > pciReadSize)
     {
-        return false;
+        return resCode::resErr;
     }
 
     std::array<uint8_t, pciReadSize> data;
     uint8_t cc;
-    int ret = peci_RdPCIConfig(clientAddr,  // CPU Address
+    int ret = PECI_CC_TIMEOUT;
+    for (int index = 0; (index < 5) && (ret == PECI_CC_TIMEOUT); index++)
+    {
+        ret = peci_RdPCIConfig(clientAddr,  // CPU Address
                                bus,         // PCI Bus
                                dev,         // PCI Device
                                func,        // PCI Function
                                pciOffset,   // PCI Offset
                                data.data(), // PCI Read Data
                                &cc);        // PECI Completion Code
-
+    }
     if (ret != PECI_CC_SUCCESS || cc != PECI_DEV_CC_SUCCESS)
     {
-        return false;
+        return resCode::resErr;
     }
 
     // Now build the requested data into a single number
@@ -177,127 +188,135 @@ static bool getDataFromPCIeConfig(const int& clientAddr, const int& bus,
         pciData |= data[i] << 8 * (i - mod);
     }
 
-    return true;
+    return resCode::resOk;
 }
 
-static std::string getStringFromPCIeConfig(const int& clientAddr,
-                                           const int& bus, const int& dev,
-                                           const int& func, const int& offset,
-                                           const int& size)
+static resCode getStringFromPCIeConfig(const int& clientAddr, const int& bus,
+                                       const int& dev, const int& func,
+                                       const int& offset, const int& size,
+                                       std::string& res)
 {
     // Get the requested data
     uint32_t data = 0;
-    if (!getDataFromPCIeConfig(clientAddr, bus, dev, func, offset, size, data))
+    if (getDataFromPCIeConfig(clientAddr, bus, dev, func, offset, size, data) !=
+        resCode::resOk)
     {
-        return std::string();
+        return resCode::resErr;
     }
 
     // And convert it to a string
     std::stringstream dataStream;
     dataStream << "0x" << std::hex << std::setfill('0') << std::setw(size * 2)
                << data;
-    return dataStream.str();
+    res = dataStream.str();
+    return resCode::resOk;
 }
 
-static std::string getVendorName(const int& clientAddr, const int& bus,
-                                 const int& dev)
+static resCode getVendorName(const int& clientAddr, const int& bus,
+                             const int& dev, std::string& res)
 {
     static constexpr const int vendorIDOffset = 0x00;
     static constexpr const int vendorIDSize = 2;
 
     // Get the header type register from function 0
     uint32_t vendorID = 0;
-    if (!getDataFromPCIeConfig(clientAddr, bus, dev, 0, vendorIDOffset,
-                               vendorIDSize, vendorID))
+    if (getDataFromPCIeConfig(clientAddr, bus, dev, 0, vendorIDOffset,
+                              vendorIDSize, vendorID) != resCode::resOk)
     {
-        return std::string();
+        return resCode::resErr;
     }
     // Get the vendor name or use Other if it doesn't exist
-    return pciVendors.try_emplace(vendorID, otherVendor).first->second;
+    res = pciVendors.try_emplace(vendorID, otherVendor).first->second;
+    return resCode::resOk;
 }
 
-static std::string getDeviceClass(const int& clientAddr, const int& bus,
-                                  const int& dev, const int& func)
+static resCode getDeviceClass(const int& clientAddr, const int& bus,
+                              const int& dev, const int& func, std::string& res)
 {
     static constexpr const int baseClassOffset = 0x0b;
     static constexpr const int baseClassSize = 1;
 
     // Get the Device Base Class
     uint32_t baseClass = 0;
-    if (!getDataFromPCIeConfig(clientAddr, bus, dev, func, baseClassOffset,
-                               baseClassSize, baseClass))
+    if (getDataFromPCIeConfig(clientAddr, bus, dev, func, baseClassOffset,
+                              baseClassSize, baseClass) != resCode::resOk)
     {
-        return std::string();
+        return resCode::resErr;
     }
     // Get the base class name or use Other if it doesn't exist
-    return pciDeviceClasses.try_emplace(baseClass, otherClass).first->second;
+    res = pciDeviceClasses.try_emplace(baseClass, otherClass).first->second;
+    return resCode::resOk;
 }
 
-static bool isMultiFunction(const int& clientAddr, const int& bus,
-                            const int& dev)
+static resCode isMultiFunction(const int& clientAddr, const int& bus,
+                               const int& dev, bool& res)
 {
     static constexpr const int headerTypeOffset = 0x0e;
     static constexpr const int headerTypeSize = 1;
     static constexpr const int multiFuncBit = 1 << 7;
 
+    res = false;
     // Get the header type register from function 0
     uint32_t headerType = 0;
-    if (!getDataFromPCIeConfig(clientAddr, bus, dev, 0, headerTypeOffset,
-                               headerTypeSize, headerType))
+    if (getDataFromPCIeConfig(clientAddr, bus, dev, 0, headerTypeOffset,
+                              headerTypeSize, headerType) != resCode::resOk)
     {
-        return false;
+        return resCode::resErr;
     }
     // Check if it's a multifunction device
     if (headerType & multiFuncBit)
     {
-        return true;
+        res = true;
     }
-    return false;
+    return resCode::resOk;
 }
 
-static bool pcieFunctionExists(const int& clientAddr, const int& bus,
-                               const int& dev, const int& func)
+static resCode pcieFunctionExists(const int& clientAddr, const int& bus,
+                                  const int& dev, const int& func, bool& res)
 {
     constexpr const int pciIDOffset = 0;
     constexpr const int pciIDSize = 4;
     uint32_t pciID = 0;
-    if (!getDataFromPCIeConfig(clientAddr, bus, dev, func, pciIDOffset,
-                               pciIDSize, pciID))
+    res = false;
+    if (getDataFromPCIeConfig(clientAddr, bus, dev, func, pciIDOffset,
+                              pciIDSize, pciID) != resCode::resOk)
     {
-        return false;
+        return resCode::resOk;
     }
 
     // if VID and DID are all 0s or 1s, then the device doesn't exist
-    if (pciID == 0x00000000 || pciID == 0xFFFFFFFF)
+    if (pciID != 0x00000000 && pciID != 0xFFFFFFFF)
     {
-        return false;
+        res = true;
     }
-
-    return true;
+    return resCode::resOk;
 }
 
-static bool pcieDeviceExists(const int& clientAddr, const int& bus,
-                             const int& dev)
+static resCode pcieDeviceExists(const int& clientAddr, const int& bus,
+                                const int& dev, bool& res)
 {
     // Check if this device exists by checking function 0
-    return (pcieFunctionExists(clientAddr, bus, dev, 0));
+    return pcieFunctionExists(clientAddr, bus, dev, 0, res);
 }
 
-static void setPCIeProperty(const int& clientAddr, const int& bus,
-                            const int& dev, const std::string& propertyName,
-                            const std::string& propertyValue)
+static resCode setPCIeProperty(const int& clientAddr, const int& bus,
+                               const int& dev, const std::string& propertyName,
+                               const std::string& propertyValue)
 {
     std::shared_ptr<sdbusplus::asio::dbus_interface> iface =
         peci_pcie::pcieDeviceDBusMap[clientAddr][bus][dev];
 
     if (iface->is_initialized())
     {
-        iface->set_property(propertyName, propertyValue);
+        if (!iface->set_property(propertyName, propertyValue))
+            return resCode::resErr;
     }
     else
     {
-        iface->register_property(propertyName, propertyValue);
+        if (!iface->register_property(propertyName, propertyValue))
+            return resCode::resErr;
     }
+    return resCode::resOk;
 }
 
 static void setDefaultPCIeFunctionProperties(const int& clientAddr,
@@ -324,9 +343,10 @@ static void setDefaultPCIeFunctionProperties(const int& clientAddr,
     }
 }
 
-static void setPCIeFunctionProperties(const int& clientAddr, const int& bus,
-                                      const int& dev, const int& func)
+static resCode setPCIeFunctionProperties(const int& clientAddr, const int& bus,
+                                         const int& dev, const int& func)
 {
+    std::string res;
     // Set the function type always to physical for now
     setPCIeProperty(clientAddr, bus, dev,
                     "Function" + std::to_string(func) +
@@ -334,10 +354,15 @@ static void setPCIeFunctionProperties(const int& clientAddr, const int& bus,
                     "Physical");
 
     // Set the function Device Class
+    resCode error = getDeviceClass(clientAddr, bus, dev, func, res);
+    if (error != resCode::resOk)
+    {
+        return error;
+    }
     setPCIeProperty(clientAddr, bus, dev,
                     "Function" + std::to_string(func) +
                         std::string(peci_pcie::function::deviceClassName),
-                    getDeviceClass(clientAddr, bus, dev, func));
+                    res);
 
     // Get PCI Function Properties that come from PCI config with the following
     // offset and size info
@@ -357,23 +382,40 @@ static void setPCIeFunctionProperties(const int& clientAddr, const int& bus,
 
     for (const auto& [name, offset, size] : pciConfigInfo)
     {
-        setPCIeProperty(
-            clientAddr, bus, dev,
-            "Function" + std::to_string(func) + std::string(name),
-            getStringFromPCIeConfig(clientAddr, bus, dev, func, offset, size));
+        error = getStringFromPCIeConfig(clientAddr, bus, dev, func, offset,
+                                        size, res);
+        if (error != resCode::resOk)
+        {
+            return error;
+        }
+        setPCIeProperty(clientAddr, bus, dev,
+                        "Function" + std::to_string(func) + std::string(name),
+                        res);
     }
+    return resCode::resOk;
 }
 
-static void setPCIeDeviceProperties(const int& clientAddr, const int& bus,
-                                    const int& dev)
+static resCode setPCIeDeviceProperties(const int& clientAddr, const int& bus,
+                                       const int& dev)
 {
     // Set the device manufacturer
-    setPCIeProperty(clientAddr, bus, dev, "Manufacturer",
-                    getVendorName(clientAddr, bus, dev));
+    std::string manuf;
+    resCode error = getVendorName(clientAddr, bus, dev, manuf);
+    if (error != resCode::resOk)
+    {
+        return error;
+    }
+    setPCIeProperty(clientAddr, bus, dev, "Manufacturer", manuf);
 
     // Set the device type
     constexpr char const* deviceTypeName = "DeviceType";
-    if (isMultiFunction(clientAddr, bus, dev))
+    bool multiFunc;
+    error = isMultiFunction(clientAddr, bus, dev, multiFunc);
+    if (error != resCode::resOk)
+    {
+        return error;
+    }
+    if (multiFunc)
     {
         setPCIeProperty(clientAddr, bus, dev, deviceTypeName, "MultiFunction");
     }
@@ -381,20 +423,34 @@ static void setPCIeDeviceProperties(const int& clientAddr, const int& bus,
     {
         setPCIeProperty(clientAddr, bus, dev, deviceTypeName, "SingleFunction");
     }
+    return resCode::resOk;
 }
 
-static void updatePCIeDevice(const int& clientAddr, const int& bus,
-                             const int& dev)
+static resCode updatePCIeDevice(const int& clientAddr, const int& bus,
+                                const int& dev)
 {
-    setPCIeDeviceProperties(clientAddr, bus, dev);
+    if (setPCIeDeviceProperties(clientAddr, bus, dev) != resCode::resOk)
+    {
+        return resCode::resErr;
+    }
 
     // Walk through and populate the functions for this device
     for (int func = 0; func < peci_pcie::maxPCIFunctions; func++)
     {
-        if (pcieFunctionExists(clientAddr, bus, dev, func))
+        bool res;
+        resCode error = pcieFunctionExists(clientAddr, bus, dev, func, res);
+        if (error != resCode::resOk)
+        {
+            return error;
+        }
+        if (res)
         {
             // Set the properties for this function
-            setPCIeFunctionProperties(clientAddr, bus, dev, func);
+            if (setPCIeFunctionProperties(clientAddr, bus, dev, func) !=
+                resCode::resOk)
+            {
+                return resCode::resErr;
+            }
         }
         else
         {
@@ -402,23 +458,7 @@ static void updatePCIeDevice(const int& clientAddr, const int& bus,
             setDefaultPCIeFunctionProperties(clientAddr, bus, dev, func);
         }
     }
-}
-
-static void addPCIeDevice(sdbusplus::asio::object_server& objServer,
-                          const int& clientAddr, const int& cpu, const int& bus,
-                          const int& dev)
-{
-    std::string pathName = std::string(peci_pcie::peciPCIePath) + "/S" +
-                           std::to_string(cpu) + "B" + std::to_string(bus) +
-                           "D" + std::to_string(dev);
-    std::shared_ptr<sdbusplus::asio::dbus_interface> iface =
-        objServer.add_interface(pathName, peci_pcie::peciPCIeDeviceInterface);
-    peci_pcie::pcieDeviceDBusMap[clientAddr][bus][dev] = iface;
-
-    // Update the properties for the new device
-    updatePCIeDevice(clientAddr, bus, dev);
-
-    iface->initialize();
+    return resCode::resOk;
 }
 
 static void removePCIeDevice(sdbusplus::asio::object_server& objServer,
@@ -439,6 +479,28 @@ static void removePCIeDevice(sdbusplus::asio::object_server& objServer,
     {
         peci_pcie::pcieDeviceDBusMap.erase(clientAddr);
     }
+}
+
+static resCode addPCIeDevice(sdbusplus::asio::object_server& objServer,
+                             const int& clientAddr, const int& cpu,
+                             const int& bus, const int& dev)
+{
+    std::string pathName = std::string(peci_pcie::peciPCIePath) + "/S" +
+                           std::to_string(cpu) + "B" + std::to_string(bus) +
+                           "D" + std::to_string(dev);
+    std::shared_ptr<sdbusplus::asio::dbus_interface> iface =
+        objServer.add_interface(pathName, peci_pcie::peciPCIeDeviceInterface);
+    peci_pcie::pcieDeviceDBusMap[clientAddr][bus][dev] = iface;
+
+    // Update the properties for the new device
+    if (updatePCIeDevice(clientAddr, bus, dev) != resCode::resOk)
+    {
+        removePCIeDevice(objServer, clientAddr, bus, dev);
+        return resCode::resErr;
+    }
+
+    iface->initialize();
+    return resCode::resOk;
 }
 
 static bool pcieDeviceInDBusMap(const int& clientAddr, const int& bus,
@@ -468,32 +530,35 @@ static void scanNextPCIeDevice(boost::asio::io_service& io,
                                std::vector<CPUInfo>& cpuInfo, int cpu, int bus,
                                int dev);
 
-static void scanPCIeDevice(boost::asio::io_service& io,
-                           sdbusplus::asio::object_server& objServer,
-                           std::vector<CPUInfo>& cpuInfo, int cpu, int bus,
-                           int dev)
+static resCode probePCIeDevice(boost::asio::io_service& io,
+                               sdbusplus::asio::object_server& objServer,
+                               std::vector<CPUInfo>& cpuInfo, int cpu, int bus,
+                               int dev)
 {
-    // Check if this is a CPU bus that we should skip
-    if (cpuInfo[cpu].skipCpuBuses && cpuInfo[cpu].cpuBusNums.count(bus))
+    bool res;
+    resCode error = pcieDeviceExists(cpuInfo[cpu].addr, bus, dev, res);
+    if (error != resCode::resOk)
     {
-        std::cerr << "Skipping CPU " << cpu << " Bus Number " << bus << "\n";
-        // Skip all the devices on this bus
-        dev = peci_pcie::maxPCIDevices;
-        scanNextPCIeDevice(io, objServer, cpuInfo, cpu, bus, dev);
-        return;
+        return error;
     }
-
-    if (pcieDeviceExists(cpuInfo[cpu].addr, bus, dev))
+    if (res)
     {
         if (pcieDeviceInDBusMap(cpuInfo[cpu].addr, bus, dev))
         {
             // This device is already in D-Bus, so update it
-            updatePCIeDevice(cpuInfo[cpu].addr, bus, dev);
+            if (updatePCIeDevice(cpuInfo[cpu].addr, bus, dev) != resCode::resOk)
+            {
+                return resCode::resErr;
+            }
         }
         else
         {
             // This device is not in D-Bus, so add it
-            addPCIeDevice(objServer, cpuInfo[cpu].addr, cpu, bus, dev);
+            if (addPCIeDevice(objServer, cpuInfo[cpu].addr, cpu, bus, dev) !=
+                resCode::resOk)
+            {
+                return resCode::resErr;
+            }
         }
     }
     else
@@ -501,7 +566,7 @@ static void scanPCIeDevice(boost::asio::io_service& io,
         // If PECI is not available, then stop scanning
         if (!isPECIAvailable())
         {
-            return;
+            return resCode::resOk;
         }
 
         if (pcieDeviceInDBusMap(cpuInfo[cpu].addr, bus, dev))
@@ -510,6 +575,31 @@ static void scanPCIeDevice(boost::asio::io_service& io,
             removePCIeDevice(objServer, cpuInfo[cpu].addr, bus, dev);
         }
     }
+    return resCode::resOk;
+}
+
+static void scanPCIeDevice(boost::asio::io_service& io,
+                           sdbusplus::asio::object_server& objServer,
+                           std::vector<CPUInfo>& cpuInfo, int cpu, int bus,
+                           int dev)
+{
+    // Check if this is a CPU bus that we should skip
+    if (cpuInfo[cpu].skipCpuBuses && cpuInfo[cpu].cpuBusNums.count(bus))
+    {
+        std::cout << "Skipping CPU " << cpu << " Bus Number " << bus << "\n";
+        // Skip all the devices on this bus
+        dev = peci_pcie::maxPCIDevices;
+        scanNextPCIeDevice(io, objServer, cpuInfo, cpu, bus, dev);
+        return;
+    }
+
+    if (probePCIeDevice(io, objServer, cpuInfo, cpu, bus, dev) !=
+        resCode::resOk)
+    {
+        std::cerr << "Failed to probe CPU " << cpu << " Bus " << bus
+                  << " Device " << dev << "\n";
+    }
+
     scanNextPCIeDevice(io, objServer, cpuInfo, cpu, bus, dev);
 }
 
@@ -534,26 +624,26 @@ static void scanNextPCIeDevice(boost::asio::io_service& io,
             }
         }
     }
-    boost::asio::post(io, [&io, &objServer, cpuInfo, cpu, bus, dev]() mutable {
+    boost::asio::post(io, [&io, &objServer, &cpuInfo, cpu, bus, dev]() mutable {
         scanPCIeDevice(io, objServer, cpuInfo, cpu, bus, dev);
     });
 }
 
 static void peciAvailableCheck(boost::asio::steady_timer& peciWaitTimer,
                                boost::asio::io_service& io,
-                               sdbusplus::asio::object_server& objServer)
+                               sdbusplus::asio::object_server& objServer,
+                               std::vector<CPUInfo>& cpuInfo)
 {
     static bool lastPECIState = false;
     bool peciAvailable = isPECIAvailable();
     if (peciAvailable && !lastPECIState)
     {
         lastPECIState = true;
-
         static boost::asio::steady_timer pcieTimeout(io);
         constexpr const int pcieWaitTime = 60;
         pcieTimeout.expires_after(std::chrono::seconds(pcieWaitTime));
         pcieTimeout.async_wait(
-            [&io, &objServer](const boost::system::error_code& ec) {
+            [&io, &objServer, &cpuInfo](const boost::system::error_code& ec) {
                 if (ec)
                 {
                     // operation_aborted is expected if timer is canceled
@@ -562,13 +652,17 @@ static void peciAvailableCheck(boost::asio::steady_timer& peciWaitTimer,
                     {
                         std::cerr << "PECI PCIe async_wait failed " << ec;
                     }
+                    lastPECIState = false;
                     return;
                 }
                 // get the PECI client address list
-                std::vector<CPUInfo> cpuInfo;
                 getClientAddrMap(cpuInfo);
                 // get the CPU Bus Numbers to skip
-                getCPUBusNums(cpuInfo);
+                if (getCPUBusNums(cpuInfo) != resCode::resOk)
+                {
+                    lastPECIState = false;
+                    return;
+                }
                 // scan PCIe starting from CPU 0, Bus 0, Device 0
                 scanPCIeDevice(io, objServer, cpuInfo, 0, 0, 0);
             });
@@ -580,8 +674,8 @@ static void peciAvailableCheck(boost::asio::steady_timer& peciWaitTimer,
 
     peciWaitTimer.expires_after(
         std::chrono::seconds(peci_pcie::peciCheckInterval));
-    peciWaitTimer.async_wait([&peciWaitTimer, &io,
-                              &objServer](const boost::system::error_code& ec) {
+    peciWaitTimer.async_wait([&peciWaitTimer, &io, &objServer,
+                              &cpuInfo](const boost::system::error_code& ec) {
         if (ec)
         {
             // operation_aborted is expected if timer is canceled
@@ -592,7 +686,7 @@ static void peciAvailableCheck(boost::asio::steady_timer& peciWaitTimer,
             }
             return;
         }
-        peciAvailableCheck(peciWaitTimer, io, objServer);
+        peciAvailableCheck(peciWaitTimer, io, objServer, cpuInfo);
     });
 }
 
@@ -608,11 +702,14 @@ int main(int argc, char* argv[])
     sdbusplus::asio::object_server server =
         sdbusplus::asio::object_server(conn);
 
+    // CPU map
+    std::vector<CPUInfo> cpuInfo;
+
     // Start the PECI check loop
     boost::asio::steady_timer peciWaitTimer(
         io, std::chrono::seconds(peci_pcie::peciCheckInterval));
-    peciWaitTimer.async_wait([&peciWaitTimer, &io,
-                              &server](const boost::system::error_code& ec) {
+    peciWaitTimer.async_wait([&peciWaitTimer, &io, &server,
+                              &cpuInfo](const boost::system::error_code& ec) {
         if (ec)
         {
             // operation_aborted is expected if timer is canceled
@@ -623,7 +720,7 @@ int main(int argc, char* argv[])
             }
             return;
         }
-        peciAvailableCheck(peciWaitTimer, io, server);
+        peciAvailableCheck(peciWaitTimer, io, server, cpuInfo);
     });
 
     io.run();
