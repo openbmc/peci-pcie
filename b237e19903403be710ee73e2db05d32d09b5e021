@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "51479ae5_59a05034",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2021-02-12T23:34:45Z",
+      "side": 1,
+      "message": "Do you want to return on error or still continue?  Returning will abort future PECI reads on error which will leave you with no further data after a single error.",
+      "revId": "b237e19903403be710ee73e2db05d32d09b5e021",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9f32b5fa_4ebd5334",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2021-02-12T23:34:45Z",
+      "side": 1,
+      "message": "The PECI driver already retries the PECI command for up to 700ms, so I don\u0027t think a retry at this level is needed.",
+      "revId": "b237e19903403be710ee73e2db05d32d09b5e021",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5ca62157_b74c1b08",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2021-02-12T23:34:45Z",
+      "side": 1,
+      "message": "I like the use of structured bindings, but in this case I think it may be easier to read if the std::string is passed in as a reference parameter and only the error code is returned.  It may make it more efficient as well to avoid making and breaking the tuples.",
+      "revId": "b237e19903403be710ee73e2db05d32d09b5e021",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "99aa29cb_c4d4f1f1",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 414,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2021-02-12T23:34:45Z",
+      "side": 1,
+      "message": "Is there a reason this uses std::tie instead of auto []?",
+      "revId": "b237e19903403be710ee73e2db05d32d09b5e021",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6ba86953_3dfc743c",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 600,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2021-02-12T23:34:45Z",
+      "side": 1,
+      "message": "Since the PECI commands are already retried, I don\u0027t think we need to retry here.",
+      "revId": "b237e19903403be710ee73e2db05d32d09b5e021",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f21f5e8e_8fe712c3",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 734,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2021-02-12T23:34:45Z",
+      "side": 1,
+      "message": "Is there a reason to move this to the main scope?",
+      "revId": "b237e19903403be710ee73e2db05d32d09b5e021",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
