@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "8d912380_77ba5bf4",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1000879
+      },
+      "writtenOn": "2021-02-15T09:12:10Z",
+      "side": 1,
+      "message": "I don\u0027t want to return not full data, I prefer to wait until next time to read it.\nIt is not so critical here, I think we can revert to \"continue\". Alternative (and IMHO better) way would be to implement Retry in peciAvailableCheck.",
+      "parentUuid": "51479ae5_59a05034",
+      "revId": "b237e19903403be710ee73e2db05d32d09b5e021",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "9f32b5fa_4ebd5334",
         "filename": "src/peci_pcie.cpp",
         "patchSetId": 4
@@ -30,6 +48,24 @@
       "writtenOn": "2021-02-12T23:34:45Z",
       "side": 1,
       "message": "The PECI driver already retries the PECI command for up to 700ms, so I don\u0027t think a retry at this level is needed.",
+      "revId": "b237e19903403be710ee73e2db05d32d09b5e021",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "733cbcb9_7774fb69",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 1000879
+      },
+      "writtenOn": "2021-02-15T09:12:10Z",
+      "side": 1,
+      "message": "My practice shows that it\u0027s required. It not so often, but still sufficient. Otherwise I didn\u0027t start this refactoring at all.",
+      "parentUuid": "9f32b5fa_4ebd5334",
       "revId": "b237e19903403be710ee73e2db05d32d09b5e021",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "c120f9a3_a3ba9b27",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1000879
+      },
+      "writtenOn": "2021-02-15T09:12:10Z",
+      "side": 1,
+      "message": "To be honest, I don\u0027t like to return function result as reference unless it is not modifying of something already exists in outer context, but if you thing it would be better here, I can rewrite this.",
+      "parentUuid": "5ca62157_b74c1b08",
+      "revId": "b237e19903403be710ee73e2db05d32d09b5e021",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "99aa29cb_c4d4f1f1",
         "filename": "src/peci_pcie.cpp",
         "patchSetId": 4
@@ -64,6 +118,24 @@
       "writtenOn": "2021-02-12T23:34:45Z",
       "side": 1,
       "message": "Is there a reason this uses std::tie instead of auto []?",
+      "revId": "b237e19903403be710ee73e2db05d32d09b5e021",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b53a0d2a_f8637311",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 414,
+      "author": {
+        "id": 1000879
+      },
+      "writtenOn": "2021-02-15T09:12:10Z",
+      "side": 1,
+      "message": "I don\u0027t know how to reuse variable with auto [], so I would need something like \"auto [multiFunc, error2]\"",
+      "parentUuid": "99aa29cb_c4d4f1f1",
       "revId": "b237e19903403be710ee73e2db05d32d09b5e021",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "6eb4a230_5417d389",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 600,
+      "author": {
+        "id": 1000879
+      },
+      "writtenOn": "2021-02-15T09:12:10Z",
+      "side": 1,
+      "message": "I don\u0027t remember details, two months past, but this was result of fighting with read errors: somewhy retrying above was not enough when host CPU busy.",
+      "parentUuid": "6ba86953_3dfc743c",
+      "revId": "b237e19903403be710ee73e2db05d32d09b5e021",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "f21f5e8e_8fe712c3",
         "filename": "src/peci_pcie.cpp",
         "patchSetId": 4
@@ -98,6 +188,24 @@
       "writtenOn": "2021-02-12T23:34:45Z",
       "side": 1,
       "message": "Is there a reason to move this to the main scope?",
+      "revId": "b237e19903403be710ee73e2db05d32d09b5e021",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d6281a8f_c241b2fb",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 734,
+      "author": {
+        "id": 1000879
+      },
+      "writtenOn": "2021-02-15T09:12:10Z",
+      "side": 1,
+      "message": "Actually no. Just intention to make it more clear to read and understand scope of it.",
+      "parentUuid": "f21f5e8e_8fe712c3",
       "revId": "b237e19903403be710ee73e2db05d32d09b5e021",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
