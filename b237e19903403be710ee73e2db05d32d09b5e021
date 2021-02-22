@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "e65577c5_19d4d106",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2021-02-22T22:49:35Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "8d912380_77ba5bf4",
+      "revId": "b237e19903403be710ee73e2db05d32d09b5e021",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f32b5fa_4ebd5334",
         "filename": "src/peci_pcie.cpp",
         "patchSetId": 4
@@ -66,6 +84,24 @@
       "side": 1,
       "message": "My practice shows that it\u0027s required. It not so often, but still sufficient. Otherwise I didn\u0027t start this refactoring at all.",
       "parentUuid": "9f32b5fa_4ebd5334",
+      "revId": "b237e19903403be710ee73e2db05d32d09b5e021",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "94e7bec0_48df8e0d",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2021-02-22T22:49:35Z",
+      "side": 1,
+      "message": "There should be a 60-second delay before this starts scanning PCIe.  I wonder if that is not long enough for the PCIe space to stabilize in BIOS.  If you wait longer than 60 seconds before starting the scan, do you still need this retry?",
+      "parentUuid": "733cbcb9_7774fb69",
       "revId": "b237e19903403be710ee73e2db05d32d09b5e021",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
@@ -107,6 +143,24 @@
     },
     {
       "key": {
+        "uuid": "40954500_2ff27ba4",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2021-02-22T22:49:35Z",
+      "side": 1,
+      "message": "I feel like it\u0027s more standard to either return the error code and provide the data in a parameter or to return the data and provide the error code in a parameter.  Another way to do it would be to return a std::optional and use std::nullopt for the error.\n\nHowever, it looks like other functions here already return data in parameters by reference, so that way would stay consistent within this module.",
+      "parentUuid": "c120f9a3_a3ba9b27",
+      "revId": "b237e19903403be710ee73e2db05d32d09b5e021",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "99aa29cb_c4d4f1f1",
         "filename": "src/peci_pcie.cpp",
         "patchSetId": 4
@@ -136,6 +190,24 @@
       "side": 1,
       "message": "I don\u0027t know how to reuse variable with auto [], so I would need something like \"auto [multiFunc, error2]\"",
       "parentUuid": "99aa29cb_c4d4f1f1",
+      "revId": "b237e19903403be710ee73e2db05d32d09b5e021",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5e5c0665_33429694",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 414,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2021-02-22T22:49:35Z",
+      "side": 1,
+      "message": "I see.  I think I may prefer error2 over std::tie.  std::tie makes this one look like it is different from the others for some reason.",
+      "parentUuid": "b53a0d2a_f8637311",
       "revId": "b237e19903403be710ee73e2db05d32d09b5e021",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
@@ -177,6 +249,24 @@
     },
     {
       "key": {
+        "uuid": "db27db60_04b97b9e",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 600,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2021-02-22T22:49:35Z",
+      "side": 1,
+      "message": "I\u0027m okay with a retry, but it would be better if we can retry only in one place.\n\nDo you remember what error code you got?  I don\u0027t usually see PECI errors because of the host CPU being busy.",
+      "parentUuid": "6eb4a230_5417d389",
+      "revId": "b237e19903403be710ee73e2db05d32d09b5e021",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "f21f5e8e_8fe712c3",
         "filename": "src/peci_pcie.cpp",
         "patchSetId": 4
@@ -209,6 +299,24 @@
       "revId": "b237e19903403be710ee73e2db05d32d09b5e021",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "250d9ddc_5b8e9077",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 734,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2021-02-22T22:49:35Z",
+      "side": 1,
+      "message": "Ack.  That makes sense.  Only possible downside is it may persistently consume this memory, but it\u0027s very small, so probably not an issue.",
+      "parentUuid": "d6281a8f_c241b2fb",
+      "revId": "b237e19903403be710ee73e2db05d32d09b5e021",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     }
   ]
 }
