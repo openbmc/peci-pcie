@@ -197,6 +197,24 @@
     },
     {
       "key": {
+        "uuid": "c6ec32f1_f07af0a1",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2021-02-24T18:10:21Z",
+      "side": 1,
+      "message": "Thanks!  I think this would be a good topic to bring up on the mailing list to get the whole community to move in this direction.",
+      "parentUuid": "866686e5_a544bae1",
+      "revId": "b237e19903403be710ee73e2db05d32d09b5e021",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "99aa29cb_c4d4f1f1",
         "filename": "src/peci_pcie.cpp",
         "patchSetId": 4
