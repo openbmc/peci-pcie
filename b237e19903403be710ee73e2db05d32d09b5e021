@@ -108,6 +108,24 @@
     },
     {
       "key": {
+        "uuid": "128e6876_eca17831",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 1000879
+      },
+      "writtenOn": "2021-02-24T06:27:21Z",
+      "side": 1,
+      "message": "This is random faults, e.g. not only on startup. I can just restart peci-pcie daemon while host is running and have this errors.",
+      "parentUuid": "94e7bec0_48df8e0d",
+      "revId": "b237e19903403be710ee73e2db05d32d09b5e021",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "5ca62157_b74c1b08",
         "filename": "src/peci_pcie.cpp",
         "patchSetId": 4
@@ -155,6 +173,24 @@
       "side": 1,
       "message": "I feel like it\u0027s more standard to either return the error code and provide the data in a parameter or to return the data and provide the error code in a parameter.  Another way to do it would be to return a std::optional and use std::nullopt for the error.\n\nHowever, it looks like other functions here already return data in parameters by reference, so that way would stay consistent within this module.",
       "parentUuid": "c120f9a3_a3ba9b27",
+      "revId": "b237e19903403be710ee73e2db05d32d09b5e021",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "866686e5_a544bae1",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1000879
+      },
+      "writtenOn": "2021-02-24T06:27:21Z",
+      "side": 1,
+      "message": "That is just because historically C was able to return only one value from function. In more modern languages, like Golang for example, it is best practice to always return both value and error code as tuple.\nBut, well, I will reword this.",
+      "parentUuid": "40954500_2ff27ba4",
       "revId": "b237e19903403be710ee73e2db05d32d09b5e021",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
@@ -214,6 +250,24 @@
     },
     {
       "key": {
+        "uuid": "d6a7e0bf_c818d83c",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 414,
+      "author": {
+        "id": 1000879
+      },
+      "writtenOn": "2021-02-24T06:27:21Z",
+      "side": 1,
+      "message": "will fix",
+      "parentUuid": "5e5c0665_33429694",
+      "revId": "b237e19903403be710ee73e2db05d32d09b5e021",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "6ba86953_3dfc743c",
         "filename": "src/peci_pcie.cpp",
         "patchSetId": 4
@@ -261,6 +315,24 @@
       "side": 1,
       "message": "I\u0027m okay with a retry, but it would be better if we can retry only in one place.\n\nDo you remember what error code you got?  I don\u0027t usually see PECI errors because of the host CPU being busy.",
       "parentUuid": "6eb4a230_5417d389",
+      "revId": "b237e19903403be710ee73e2db05d32d09b5e021",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ac19be52_e9e703ec",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 600,
+      "author": {
+        "id": 1000879
+      },
+      "writtenOn": "2021-02-24T06:27:21Z",
+      "side": 1,
+      "message": "If I remember right, it was timeout error. I can retest this when I have time.",
+      "parentUuid": "db27db60_04b97b9e",
       "revId": "b237e19903403be710ee73e2db05d32d09b5e021",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
