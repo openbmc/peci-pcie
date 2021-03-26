@@ -215,6 +215,24 @@
     },
     {
       "key": {
+        "uuid": "f8cde569_e5957dbe",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1000879
+      },
+      "writtenOn": "2021-03-26T18:15:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c6ec32f1_f07af0a1",
+      "revId": "b237e19903403be710ee73e2db05d32d09b5e021",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99aa29cb_c4d4f1f1",
         "filename": "src/peci_pcie.cpp",
         "patchSetId": 4
@@ -286,6 +304,24 @@
     },
     {
       "key": {
+        "uuid": "f9e15eb4_2dfcbafb",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 414,
+      "author": {
+        "id": 1000879
+      },
+      "writtenOn": "2021-03-26T18:15:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d6a7e0bf_c818d83c",
+      "revId": "b237e19903403be710ee73e2db05d32d09b5e021",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6ba86953_3dfc743c",
         "filename": "src/peci_pcie.cpp",
         "patchSetId": 4
@@ -351,6 +387,24 @@
       "side": 1,
       "message": "If I remember right, it was timeout error. I can retest this when I have time.",
       "parentUuid": "db27db60_04b97b9e",
+      "revId": "b237e19903403be710ee73e2db05d32d09b5e021",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "868286e0_73f00135",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 600,
+      "author": {
+        "id": 1000879
+      },
+      "writtenOn": "2021-03-26T18:15:04Z",
+      "side": 1,
+      "message": "I finally found some time to retest this. I wasn\u0027t able to reproduce situations where retries in  getDataFromPCIeConfig are not enough on the system I have today.\nSo I remove part of the code here, let\u0027s hope it will always work fine.",
+      "parentUuid": "ac19be52_e9e703ec",
       "revId": "b237e19903403be710ee73e2db05d32d09b5e021",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
