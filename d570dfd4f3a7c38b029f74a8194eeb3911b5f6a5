@@ -1,0 +1,8 @@
+Code-Review+2: Jason Bills <jason.m.bills@linux.intel.com>
+Verified+1: OpenBMC CI <openbmcbump-ci@yahoo.com>
+Ok-To-Test+1: OpenBMC CI <openbmcbump-ci@yahoo.com>
+Submitted-by: Andrei Kartashev <a.kartashev@yadro.com>
+Submitted-at: Tue, 30 Mar 2021 06:04:24 +0000
+Reviewed-on: https://gerrit.openbmc-project.xyz/c/openbmc/peci-pcie/+/39141
+Project: openbmc/peci-pcie
+Branch: refs/heads/master
