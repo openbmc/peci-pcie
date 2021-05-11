@@ -52,6 +52,17 @@ static constexpr char const* revisionIdName = "RevisionId";
 static constexpr char const* subsystemIdName = "SubsystemId";
 static constexpr char const* subsystemVendorIdName = "SubsystemVendorId";
 } // namespace function
+
+static constexpr const std::array pciConfigInfo{
+    std::tuple<const char*, int, int>{function::functionTypeName, -1, -1},
+    std::tuple<const char*, int, int>{function::deviceClassName, -1, -1},
+    std::tuple<const char*, int, int>{function::vendorIdName, 0, 2},
+    std::tuple<const char*, int, int>{function::deviceIdName, 2, 2},
+    std::tuple<const char*, int, int>{function::classCodeName, 9, 3},
+    std::tuple<const char*, int, int>{function::revisionIdName, 8, 1},
+    std::tuple<const char*, int, int>{function::subsystemIdName, 0x2e, 2},
+    std::tuple<const char*, int, int>{function::subsystemVendorIdName, 0x2c,
+                                      2}};
 } // namespace peci_pcie
 
 enum class resCode
@@ -206,19 +217,9 @@ static resCode getDataFromPCIeConfig(const int& clientAddr, const int& bus,
     return resCode::resOk;
 }
 
-static resCode getStringFromPCIeConfig(const int& clientAddr, const int& bus,
-                                       const int& dev, const int& func,
-                                       const int& offset, const int& size,
-                                       std::string& res)
+static resCode getStringFromData(const int& size, const uint32_t& data,
+                                 std::string& res)
 {
-    // Get the requested data
-    uint32_t data = 0;
-    if (getDataFromPCIeConfig(clientAddr, bus, dev, func, offset, size, data) !=
-        resCode::resOk)
-    {
-        return resCode::resErr;
-    }
-
     // And convert it to a string
     std::stringstream dataStream;
     dataStream << "0x" << std::hex << std::setfill('0') << std::setw(size * 2)
@@ -339,18 +340,7 @@ static void setDefaultPCIeFunctionProperties(const int& clientAddr,
                                              const int& func)
 {
     // Set the function-specific properties
-    static constexpr const std::array functionProperties{
-        peci_pcie::function::functionTypeName,
-        peci_pcie::function::deviceClassName,
-        peci_pcie::function::vendorIdName,
-        peci_pcie::function::deviceIdName,
-        peci_pcie::function::classCodeName,
-        peci_pcie::function::revisionIdName,
-        peci_pcie::function::subsystemIdName,
-        peci_pcie::function::subsystemVendorIdName,
-    };
-
-    for (const char* name : functionProperties)
+    for (const auto& [name, offset, size] : peci_pcie::pciConfigInfo)
     {
         setPCIeProperty(clientAddr, bus, dev,
                         "Function" + std::to_string(func) + std::string(name),
@@ -361,7 +351,29 @@ static void setDefaultPCIeFunctionProperties(const int& clientAddr,
 static resCode setPCIeFunctionProperties(const int& clientAddr, const int& bus,
                                          const int& dev, const int& func)
 {
+    uint32_t data = 0;
     std::string res;
+    resCode error;
+
+    for (const auto& [name, offset, size] : peci_pcie::pciConfigInfo)
+    {
+        if (offset < 0)
+        {
+            continue;
+        }
+
+        error = getDataFromPCIeConfig(clientAddr, bus, dev, func, offset, size,
+                                      data);
+        if (error != resCode::resOk)
+        {
+            return error;
+        }
+        getStringFromData(size, data, res);
+        setPCIeProperty(clientAddr, bus, dev,
+                        "Function" + std::to_string(func) + std::string(name),
+                        res);
+    }
+
     // Set the function type always to physical for now
     setPCIeProperty(clientAddr, bus, dev,
                     "Function" + std::to_string(func) +
@@ -369,7 +381,7 @@ static resCode setPCIeFunctionProperties(const int& clientAddr, const int& bus,
                     "Physical");
 
     // Set the function Device Class
-    resCode error = getDeviceClass(clientAddr, bus, dev, func, res);
+    error = getDeviceClass(clientAddr, bus, dev, func, res);
     if (error != resCode::resOk)
     {
         return error;
@@ -378,35 +390,6 @@ static resCode setPCIeFunctionProperties(const int& clientAddr, const int& bus,
                     "Function" + std::to_string(func) +
                         std::string(peci_pcie::function::deviceClassName),
                     res);
-
-    // Get PCI Function Properties that come from PCI config with the following
-    // offset and size info
-    static constexpr const std::array pciConfigInfo{
-        std::tuple<const char*, int, int>{peci_pcie::function::vendorIdName, 0,
-                                          2},
-        std::tuple<const char*, int, int>{peci_pcie::function::deviceIdName, 2,
-                                          2},
-        std::tuple<const char*, int, int>{peci_pcie::function::classCodeName, 9,
-                                          3},
-        std::tuple<const char*, int, int>{peci_pcie::function::revisionIdName,
-                                          8, 1},
-        std::tuple<const char*, int, int>{peci_pcie::function::subsystemIdName,
-                                          0x2e, 2},
-        std::tuple<const char*, int, int>{
-            peci_pcie::function::subsystemVendorIdName, 0x2c, 2}};
-
-    for (const auto& [name, offset, size] : pciConfigInfo)
-    {
-        error = getStringFromPCIeConfig(clientAddr, bus, dev, func, offset,
-                                        size, res);
-        if (error != resCode::resOk)
-        {
-            return error;
-        }
-        setPCIeProperty(clientAddr, bus, dev,
-                        "Function" + std::to_string(func) + std::string(name),
-                        res);
-    }
     return resCode::resOk;
 }
 
