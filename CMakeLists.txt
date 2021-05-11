@@ -4,7 +4,7 @@ include (ExternalProject)
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_executable (peci-pcie src/peci_pcie.cpp)
+add_executable (peci-pcie src/peci_pcie.cpp src/pci_ids.cpp)
 
 option (YOCTO "Enable Building in Yocto" OFF)
 
