@@ -16,8 +16,7 @@
 
 #include "peci_pcie.hpp"
 
-#include "pciDeviceClass.hpp"
-#include "pciVendors.hpp"
+#include "pci_ids.hpp"
 
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/steady_timer.hpp>
@@ -42,6 +41,9 @@ namespace function
 {
 static constexpr char const* functionTypeName = "FunctionType";
 static constexpr char const* deviceClassName = "DeviceClass";
+static constexpr char const* vendorNameName = "VendorName";
+static constexpr char const* deviceNameName = "DeviceName";
+static constexpr char const* subsystemNameName = "SubsystemName";
 static constexpr char const* vendorIdName = "VendorId";
 static constexpr char const* deviceIdName = "DeviceId";
 static constexpr char const* classCodeName = "ClassCode";
@@ -53,6 +55,9 @@ static constexpr char const* subsystemVendorIdName = "SubsystemVendorId";
 static constexpr const std::array pciConfigInfo{
     std::tuple<const char*, int, int>{function::functionTypeName, -1, -1},
     std::tuple<const char*, int, int>{function::deviceClassName, -1, -1},
+    std::tuple<const char*, int, int>{function::vendorNameName, -1, -1},
+    std::tuple<const char*, int, int>{function::deviceNameName, -1, -1},
+    std::tuple<const char*, int, int>{function::subsystemNameName, -1, -1},
     std::tuple<const char*, int, int>{function::vendorIdName, 0, 2},
     std::tuple<const char*, int, int>{function::deviceIdName, 2, 2},
     std::tuple<const char*, int, int>{function::classCodeName, 9, 3},
@@ -213,39 +218,53 @@ static resCode getStringFromData(const int& size, const uint32_t& data,
     return resCode::resOk;
 }
 
-static resCode getVendorName(const int& clientAddr, const int& bus,
-                             const int& dev, std::string& res)
+static resCode getPCIDeviceInfo(const int& clientAddr, const int& bus,
+                                const int& dev, std::string& manuf,
+                                std::string& device, std::string& subsystem)
 {
-    static constexpr const int vendorIDOffset = 0x00;
-    static constexpr const int vendorIDSize = 2;
+    resCode error;
+    uint32_t vid = 0;
+    uint32_t did = 0;
+    uint32_t subvid = 0;
+    uint32_t subdid = 0;
 
-    // Get the header type register from function 0
-    uint32_t vendorID = 0;
-    if (getDataFromPCIeConfig(clientAddr, bus, dev, 0, vendorIDOffset,
-                              vendorIDSize, vendorID) != resCode::resOk)
+    for (const auto& [name, offset, size] : peci_pcie::pciConfigInfo)
     {
-        return resCode::resErr;
+        if (name == peci_pcie::function::vendorIdName)
+        {
+            error = getDataFromPCIeConfig(clientAddr, bus, dev, 0, offset, size,
+                                          vid);
+        }
+        else if (name == peci_pcie::function::deviceIdName)
+        {
+            error = getDataFromPCIeConfig(clientAddr, bus, dev, 0, offset, size,
+                                          did);
+        }
+        else if (name == peci_pcie::function::subsystemVendorIdName)
+        {
+            error = getDataFromPCIeConfig(clientAddr, bus, dev, 0, offset, size,
+                                          subvid);
+        }
+        else if (name == peci_pcie::function::subsystemIdName)
+        {
+            error = getDataFromPCIeConfig(clientAddr, bus, dev, 0, offset, size,
+                                          subdid);
+        }
+        else
+        {
+            continue;
+        }
+        if (error != resCode::resOk)
+        {
+            return error;
+        }
     }
-    // Get the vendor name or use Other if it doesn't exist
-    res = pciVendors.try_emplace(vendorID, otherVendor).first->second;
-    return resCode::resOk;
-}
 
-static resCode getDeviceClass(const int& clientAddr, const int& bus,
-                              const int& dev, const int& func, std::string& res)
-{
-    static constexpr const int baseClassOffset = 0x0b;
-    static constexpr const int baseClassSize = 1;
-
-    // Get the Device Base Class
-    uint32_t baseClass = 0;
-    if (getDataFromPCIeConfig(clientAddr, bus, dev, func, baseClassOffset,
-                              baseClassSize, baseClass) != resCode::resOk)
-    {
-        return resCode::resErr;
-    }
-    // Get the base class name or use Other if it doesn't exist
-    res = pciDeviceClasses.try_emplace(baseClass, otherClass).first->second;
+    pciidInfo pciDevInfo;
+    pciidGetDevice(vid, did, subvid, subdid, pciDevInfo);
+    manuf = pciDevInfo.vendorName;
+    device = pciDevInfo.deviceName;
+    subsystem = pciDevInfo.subsystem;
     return resCode::resOk;
 }
 
@@ -339,6 +358,11 @@ static resCode setPCIeFunctionProperties(const int& clientAddr, const int& bus,
     uint32_t data = 0;
     std::string res;
     resCode error;
+    uint32_t vid = 0;
+    uint32_t did = 0;
+    uint32_t subvid = 0;
+    uint32_t subdid = 0;
+    uint32_t classid = 0;
 
     for (const auto& [name, offset, size] : peci_pcie::pciConfigInfo)
     {
@@ -357,6 +381,27 @@ static resCode setPCIeFunctionProperties(const int& clientAddr, const int& bus,
         setPCIeProperty(clientAddr, bus, dev,
                         "Function" + std::to_string(func) + std::string(name),
                         res);
+
+        if (name == peci_pcie::function::vendorIdName)
+        {
+            vid = data;
+        }
+        else if (name == peci_pcie::function::deviceIdName)
+        {
+            did = data;
+        }
+        else if (name == peci_pcie::function::subsystemVendorIdName)
+        {
+            subvid = data;
+        }
+        else if (name == peci_pcie::function::subsystemIdName)
+        {
+            subdid = data;
+        }
+        else if (name == peci_pcie::function::classCodeName)
+        {
+            classid = data;
+        }
     }
 
     // Set the function type always to physical for now
@@ -365,12 +410,23 @@ static resCode setPCIeFunctionProperties(const int& clientAddr, const int& bus,
                         std::string(peci_pcie::function::functionTypeName),
                     "Physical");
 
-    // Set the function Device Class
-    error = getDeviceClass(clientAddr, bus, dev, func, res);
-    if (error != resCode::resOk)
-    {
-        return error;
-    }
+    // Set the function Vendor/Device/Class information
+    pciidInfo pciDevInfo;
+    pciidGetDevice(vid, did, subvid, subdid, pciDevInfo);
+    setPCIeProperty(clientAddr, bus, dev,
+                    "Function" + std::to_string(func) +
+                        std::string(peci_pcie::function::vendorNameName),
+                    pciDevInfo.vendorName);
+    setPCIeProperty(clientAddr, bus, dev,
+                    "Function" + std::to_string(func) +
+                        std::string(peci_pcie::function::deviceNameName),
+                    pciDevInfo.deviceName);
+    setPCIeProperty(clientAddr, bus, dev,
+                    "Function" + std::to_string(func) +
+                        std::string(peci_pcie::function::subsystemNameName),
+                    pciDevInfo.subsystem);
+
+    pciidGetClass(classid, res);
     setPCIeProperty(clientAddr, bus, dev,
                     "Function" + std::to_string(func) +
                         std::string(peci_pcie::function::deviceClassName),
@@ -383,12 +439,17 @@ static resCode setPCIeDeviceProperties(const int& clientAddr, const int& bus,
 {
     // Set the device manufacturer
     std::string manuf;
-    resCode error = getVendorName(clientAddr, bus, dev, manuf);
+    std::string device;
+    std::string subsystem;
+    resCode error =
+        getPCIDeviceInfo(clientAddr, bus, dev, manuf, device, subsystem);
     if (error != resCode::resOk)
     {
         return error;
     }
     setPCIeProperty(clientAddr, bus, dev, "Manufacturer", manuf);
+    setPCIeProperty(clientAddr, bus, dev, "Device", device);
+    setPCIeProperty(clientAddr, bus, dev, "Subsystem", subsystem);
 
     // Set the device type
     constexpr char const* deviceTypeName = "DeviceType";
