@@ -17,6 +17,8 @@
 #pragma once
 #include <boost/container/flat_map.hpp>
 
+#include <string>
+
 static constexpr char const* coprocessorSubClass = "Coprocessor";
 static constexpr char const* otherClass = "Other";
 
