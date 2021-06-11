@@ -171,6 +171,17 @@ static resCode getDataFromPCIeConfig(const int& clientAddr, const int& bus,
     int ret = PECI_CC_TIMEOUT;
     for (int index = 0; (index < 5) && (ret == PECI_CC_TIMEOUT); index++)
     {
+#ifdef USE_RDENDPOINTCFG
+        ret = peci_RdEndPointConfigPci(clientAddr,  // CPU Address
+                                       0,           // PCI Seg (use 0 for now)
+                                       bus,         // PCI Bus
+                                       dev,         // PCI Device
+                                       func,        // PCI Function
+                                       pciOffset,   // PCI Offset
+                                       pciReadSize, // PCI Read Size
+                                       data.data(), // PCI Read Data
+                                       &cc);        // PECI Completion Code
+#else
         ret = peci_RdPCIConfig(clientAddr,  // CPU Address
                                bus,         // PCI Bus
                                dev,         // PCI Device
@@ -178,6 +189,7 @@ static resCode getDataFromPCIeConfig(const int& clientAddr, const int& bus,
                                pciOffset,   // PCI Offset
                                data.data(), // PCI Read Data
                                &cc);        // PECI Completion Code
+#endif
     }
     if (ret != PECI_CC_SUCCESS || cc != PECI_DEV_CC_SUCCESS)
     {

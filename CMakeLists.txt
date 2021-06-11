@@ -12,8 +12,15 @@ option (
     OFF
 )
 
+option (
+    USE_RDENDPOINTCFG
+    "Use the RdEndpointConfig PECI command to read PCI data"
+    OFF
+)
+
 target_compile_definitions (
     peci-pcie PRIVATE $<$<BOOL:${WAIT_FOR_OS_STANDBY}>: -DWAIT_FOR_OS_STANDBY>
+    peci-pcie PRIVATE $<$<BOOL:${USE_RDENDPOINTCFG}>: -DUSE_RDENDPOINTCFG>
 )
 
 option (YOCTO "Enable Building in Yocto" OFF)
