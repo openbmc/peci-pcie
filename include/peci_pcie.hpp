@@ -32,4 +32,5 @@ static constexpr const int maxPCIDevices = 32;
 static constexpr const int maxPCIFunctions = 8;
 
 static constexpr const int peciCheckInterval = 10;
+static constexpr const int osStandbyDelaySeconds = 10;
 } // namespace peci_pcie
