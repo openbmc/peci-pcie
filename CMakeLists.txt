@@ -6,6 +6,16 @@ set (CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable (peci-pcie src/peci_pcie.cpp)
 
+option (
+    WAIT_FOR_OS_STANDBY
+    "Wait for the OS Standby state to indicate that BIOS is complete before starting the PCIe scan"
+    OFF
+)
+
+target_compile_definitions (
+    peci-pcie PRIVATE $<$<BOOL:${WAIT_FOR_OS_STANDBY}>: -DWAIT_FOR_OS_STANDBY>
+)
+
 option (YOCTO "Enable Building in Yocto" OFF)
 
 if (NOT YOCTO)

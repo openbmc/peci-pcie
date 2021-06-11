@@ -24,6 +24,7 @@
 #include <boost/container/flat_map.hpp>
 #include <boost/container/flat_set.hpp>
 #include <sdbusplus/asio/object_server.hpp>
+#include <sdbusplus/bus/match.hpp>
 
 #include <iomanip>
 #include <iostream>
@@ -37,6 +38,8 @@ static boost::container::flat_map<
              int, boost::container::flat_map<
                       int, std::shared_ptr<sdbusplus::asio::dbus_interface>>>>
     pcieDeviceDBusMap;
+
+static bool abortScan;
 
 namespace function
 {
@@ -608,6 +611,12 @@ static void scanNextPCIeDevice(boost::asio::io_service& io,
                                std::vector<CPUInfo>& cpuInfo, int cpu, int bus,
                                int dev)
 {
+    if (peci_pcie::abortScan)
+    {
+        std::cerr << "PCIe scan aborted\n";
+        return;
+    }
+
     // PCIe Device scan completed, so move to the next device
     if (++dev >= peci_pcie::maxPCIDevices)
     {
@@ -620,6 +629,7 @@ static void scanNextPCIeDevice(boost::asio::io_service& io,
             if (++cpu >= cpuInfo.size())
             {
                 // All CPUs scanned, so we're done
+                std::cerr << "PCIe scan completed\n";
                 return;
             }
         }
@@ -664,6 +674,7 @@ static void peciAvailableCheck(boost::asio::steady_timer& peciWaitTimer,
                     return;
                 }
                 // scan PCIe starting from CPU 0, Bus 0, Device 0
+                std::cerr << "PCIe scan started\n";
                 scanPCIeDevice(io, objServer, cpuInfo, 0, 0, 0);
             });
     }
@@ -690,6 +701,122 @@ static void peciAvailableCheck(boost::asio::steady_timer& peciWaitTimer,
     });
 }
 
+static void waitForOSStandbyDelay(boost::asio::io_service& io,
+                                  sdbusplus::asio::object_server& objServer,
+                                  boost::asio::steady_timer& osStandbyTimer,
+                                  std::vector<CPUInfo>& cpuInfo)
+{
+    osStandbyTimer.expires_after(
+        std::chrono::seconds(peci_pcie::osStandbyDelaySeconds));
+
+    osStandbyTimer.async_wait(
+        [&io, &objServer, &cpuInfo](const boost::system::error_code& ec) {
+            if (ec == boost::asio::error::operation_aborted)
+            {
+                return; // we're being canceled
+            }
+            else if (ec)
+            {
+                std::cerr << "OS Standby async_wait failed: " << ec.value()
+                          << ": " << ec.message() << "\n";
+                return;
+            }
+            // get the PECI client address list
+            getClientAddrMap(cpuInfo);
+            if (cpuInfo.empty())
+            {
+                std::cerr << "No CPUs found, scan skipped\n";
+                return;
+            }
+            // get the CPU Bus Numbers to skip
+            if (getCPUBusNums(cpuInfo) != resCode::resOk)
+            {
+                return;
+            }
+            // scan PCIe starting from CPU 0, Bus 0, Device 0
+            std::cerr << "PCIe scan started\n";
+            scanPCIeDevice(io, objServer, cpuInfo, 0, 0, 0);
+        });
+}
+
+static void monitorOSStandby(boost::asio::io_service& io,
+                             std::shared_ptr<sdbusplus::asio::connection> conn,
+                             sdbusplus::asio::object_server& objServer,
+                             boost::asio::steady_timer& osStandbyTimer,
+                             std::vector<CPUInfo>& cpuInfo)
+{
+    std::cerr << "Start OperatingSystemState Monitor\n";
+
+    static sdbusplus::bus::match::match osStateMatch(
+        *conn,
+        "type='signal',interface='org.freedesktop.DBus.Properties',member='"
+        "PropertiesChanged',arg0='xyz.openbmc_project.State.OperatingSystem."
+        "Status'",
+        [&io, &objServer, &osStandbyTimer,
+         &cpuInfo](sdbusplus::message::message& msg) {
+            // Get the OS State from the message
+            std::string osStateInterface;
+            boost::container::flat_map<std::string, std::variant<std::string>>
+                propertiesChanged;
+            msg.read(osStateInterface, propertiesChanged);
+
+            for (const auto& [name, value] : propertiesChanged)
+            {
+                if (name == "OperatingSystemState")
+                {
+                    const std::string* state = std::get_if<std::string>(&value);
+                    if (state == nullptr)
+                    {
+                        std::cerr << "Unable to read OS state value\n";
+                        return;
+                    }
+
+                    if (*state == "Standby")
+                    {
+                        peci_pcie::abortScan = false;
+                        waitForOSStandbyDelay(io, objServer, osStandbyTimer,
+                                              cpuInfo);
+                    }
+                    else if (*state == "Inactive")
+                    {
+                        peci_pcie::abortScan = true;
+                        osStandbyTimer.cancel();
+                    }
+                }
+            }
+        });
+
+    // Check if the OS state is already available
+    conn->async_method_call(
+        [&io, &objServer, &osStandbyTimer,
+         &cpuInfo](boost::system::error_code ec,
+                   const std::variant<std::string>& property) {
+            if (ec)
+            {
+                std::cerr << "error with OS state async_method_call\n";
+                return;
+            }
+
+            const std::string* state = std::get_if<std::string>(&property);
+            if (state == nullptr)
+            {
+                std::cerr << "Unable to read OS state value\n";
+                return;
+            }
+
+            // If the OS state is in Standby, then BIOS is done and we can
+            // continue.  Otherwise, we just wait for the match
+            if (*state == "Standby")
+            {
+                waitForOSStandbyDelay(io, objServer, osStandbyTimer, cpuInfo);
+            }
+        },
+        "xyz.openbmc_project.State.OperatingSystem",
+        "/xyz/openbmc_project/state/os", "org.freedesktop.DBus.Properties",
+        "Get", "xyz.openbmc_project.State.OperatingSystem.Status",
+        "OperatingSystemState");
+}
+
 int main(int argc, char* argv[])
 {
     // setup connection to dbus
@@ -705,6 +832,10 @@ int main(int argc, char* argv[])
     // CPU map
     std::vector<CPUInfo> cpuInfo;
 
+#ifdef WAIT_FOR_OS_STANDBY
+    boost::asio::steady_timer osStandbyTimer(io);
+    monitorOSStandby(io, conn, server, osStandbyTimer, cpuInfo);
+#else
     // Start the PECI check loop
     boost::asio::steady_timer peciWaitTimer(
         io, std::chrono::seconds(peci_pcie::peciCheckInterval));
@@ -722,6 +853,7 @@ int main(int argc, char* argv[])
         }
         peciAvailableCheck(peciWaitTimer, io, server, cpuInfo);
     });
+#endif
 
     io.run();
 
