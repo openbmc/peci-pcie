@@ -200,7 +200,7 @@ static resCode getDataFromPCIeConfig(const int& clientAddr, const int& bus,
     pciData = 0;
     for (int i = mod; i < mod + size; i++)
     {
-        pciData |= data[i] << 8 * (i - mod);
+        pciData |= static_cast<uint32_t>(data[i]) << 8 * (i - mod);
     }
 
     return resCode::resOk;
