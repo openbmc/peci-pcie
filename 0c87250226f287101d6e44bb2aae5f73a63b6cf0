@@ -16,6 +16,24 @@
       "revId": "0c87250226f287101d6e44bb2aae5f73a63b6cf0",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d9eb4f79_95341004",
+        "filename": "src/pci_ids.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1000879
+      },
+      "writtenOn": "2021-06-21T13:32:52Z",
+      "side": 1,
+      "message": "It generally not so big to have any performance difference: this map only cache entries for devices found in the system. I believe we will have not more then ~10 entries for each.",
+      "parentUuid": "9acf27d8_33a2782b",
+      "revId": "0c87250226f287101d6e44bb2aae5f73a63b6cf0",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
     }
   ]
 }
