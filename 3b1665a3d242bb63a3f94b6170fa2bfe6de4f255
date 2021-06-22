@@ -1,0 +1,9 @@
+Ok-To-Test+1: OpenBMC CI <openbmcbump-ci@yahoo.com>
+Verified+1: OpenBMC CI <openbmcbump-ci@yahoo.com>
+Code-Review+1: Zhikui Ren <zhikui.ren@intel.com>
+Code-Review+2: Jason Bills <jason.m.bills@linux.intel.com>
+Submitted-by: Jason Bills <jason.m.bills@linux.intel.com>
+Submitted-at: Tue, 22 Jun 2021 18:40:36 +0000
+Reviewed-on: https://gerrit.openbmc-project.xyz/c/openbmc/peci-pcie/+/44024
+Project: openbmc/peci-pcie
+Branch: refs/heads/master
