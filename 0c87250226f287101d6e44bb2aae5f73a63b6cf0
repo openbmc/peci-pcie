@@ -149,6 +149,30 @@
     },
     {
       "key": {
+        "uuid": "da0fe2e0_61680cf6",
+        "filename": "src/pci_ids.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1000153
+      },
+      "writtenOn": "2021-06-24T16:34:54Z",
+      "side": 1,
+      "message": "Because it follows the coding standard.",
+      "parentUuid": "aa07f140_04a2e720",
+      "range": {
+        "startLine": 47,
+        "startChar": 8,
+        "endLine": 47,
+        "endChar": 24
+      },
+      "revId": "0c87250226f287101d6e44bb2aae5f73a63b6cf0",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "441d54ab_d46ecc15",
         "filename": "src/pci_ids.cpp",
         "patchSetId": 2
@@ -184,6 +208,30 @@
       "side": 1,
       "message": "No, it is not incremented, it still char array of 16 bytes.\nBut probably I should use sstream here instead of snprintf.",
       "parentUuid": "441d54ab_d46ecc15",
+      "range": {
+        "startLine": 50,
+        "startChar": 25,
+        "endLine": 50,
+        "endChar": 39
+      },
+      "revId": "0c87250226f287101d6e44bb2aae5f73a63b6cf0",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7fe2bc38_5dbcd650",
+        "filename": "src/pci_ids.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1000153
+      },
+      "writtenOn": "2021-06-24T16:34:54Z",
+      "side": 1,
+      "message": "ah, you\u0027re right, I got confused here about what was going on.",
+      "parentUuid": "e5f85ac1_439e36ff",
       "range": {
         "startLine": 50,
         "startChar": 25,
@@ -302,6 +350,30 @@
       "side": 1,
       "message": "Note that in this case we will have to load entire list to the memory.\nTaking in account the fact that there typically not so many devices installed and they not so frequently changes, I would prefer to load entries on demand.",
       "parentUuid": "e5b44f06_1d3d4f67",
+      "range": {
+        "startLine": 61,
+        "startChar": 0,
+        "endLine": 61,
+        "endChar": 38
+      },
+      "revId": "0c87250226f287101d6e44bb2aae5f73a63b6cf0",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "35335009_3c977093",
+        "filename": "src/pci_ids.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1000153
+      },
+      "writtenOn": "2021-06-24T16:34:54Z",
+      "side": 1,
+      "message": "My concern here is for first boot times.  This is going to consume quite a bit of CPU on boot when the BMC really can\u0027t afford to be using a bunch of excess CPU and IO bandwidth.\n\nYes, it would require a different solution.  What I\u0027ve done in the past would be to write a python script to generate sorted, std::arrays of elements that then get compiled into the app.  Because they\u0027re sorted, they can then be binary searched (using std::lower_range) at runtime without incurring any runtime overhead of reading in a file.\n\nUp to you and Jason if that\u0027s something you want to do, but I personally think it would be better.  It also prevents an attack vector if the attacker gets access to the filesystem and finds a bug in the parser algorithm, which is less of a concern, but has happened to other BMCs before.",
+      "parentUuid": "cc424fb4_87400d33",
       "range": {
         "startLine": 61,
         "startChar": 0,
