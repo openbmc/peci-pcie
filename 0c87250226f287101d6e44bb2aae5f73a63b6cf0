@@ -290,6 +290,30 @@
     },
     {
       "key": {
+        "uuid": "cc424fb4_87400d33",
+        "filename": "src/pci_ids.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1000879
+      },
+      "writtenOn": "2021-06-24T09:02:29Z",
+      "side": 1,
+      "message": "Note that in this case we will have to load entire list to the memory.\nTaking in account the fact that there typically not so many devices installed and they not so frequently changes, I would prefer to load entries on demand.",
+      "parentUuid": "e5b44f06_1d3d4f67",
+      "range": {
+        "startLine": 61,
+        "startChar": 0,
+        "endLine": 61,
+        "endChar": 38
+      },
+      "revId": "0c87250226f287101d6e44bb2aae5f73a63b6cf0",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "c5b11541_fe11c325",
         "filename": "src/pci_ids.cpp",
         "patchSetId": 2
