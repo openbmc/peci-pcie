@@ -79,27 +79,21 @@ struct CPUInfo
 };
 
 // PECI Client Address Map
-static void getClientAddrMap(std::vector<CPUInfo>& cpuInfo)
+static resCode getCPUBusMap(std::vector<CPUInfo>& cpuInfo)
 {
     cpuInfo.clear();
-    for (size_t i = MIN_CLIENT_ADDR; i <= MAX_CLIENT_ADDR; i++)
+    for (size_t addr = MIN_CLIENT_ADDR; addr <= MAX_CLIENT_ADDR; addr++)
     {
-        if (peci_Ping(i) == PECI_CC_SUCCESS)
+        if (peci_Ping(addr) != PECI_CC_SUCCESS)
         {
-            cpuInfo.emplace_back(CPUInfo{i, false, {}});
+            continue;
         }
-    }
-}
 
-// Get CPU PCIe Bus Numbers
-static resCode getCPUBusNums(std::vector<CPUInfo>& cpuInfo)
-{
-    for (CPUInfo& cpu : cpuInfo)
-    {
+        auto& cpu = cpuInfo.emplace_back(CPUInfo{addr, false, {}});
         uint8_t cc = 0;
         CPUModel model{};
         uint8_t stepping = 0;
-        if (peci_GetCPUID(cpu.addr, &model, &stepping, &cc) != PECI_CC_SUCCESS)
+        if (peci_GetCPUID(addr, &model, &stepping, &cc) != PECI_CC_SUCCESS)
         {
             std::cerr << "Cannot get CPUID!\n";
             return resCode::resErr;
@@ -112,14 +106,14 @@ static resCode getCPUBusNums(std::vector<CPUInfo>& cpuInfo)
                 // Get the assigned CPU bus numbers from CPUBUSNO and CPUBUSNO1
                 // (B(0) D8 F2 offsets CCh and D0h)
                 uint32_t cpuBusNum = 0;
-                if (peci_RdPCIConfigLocal(cpu.addr, 0, 8, 2, 0xCC, 4,
+                if (peci_RdPCIConfigLocal(addr, 0, 8, 2, 0xCC, 4,
                                           (uint8_t*)&cpuBusNum,
                                           &cc) != PECI_CC_SUCCESS)
                 {
                     return resCode::resErr;
                 }
                 uint32_t cpuBusNum1 = 0;
-                if (peci_RdPCIConfigLocal(cpu.addr, 0, 8, 2, 0xD0, 4,
+                if (peci_RdPCIConfigLocal(addr, 0, 8, 2, 0xD0, 4,
                                           (uint8_t*)&cpuBusNum1,
                                           &cc) != PECI_CC_SUCCESS)
                 {
@@ -147,7 +141,7 @@ static resCode getCPUBusNums(std::vector<CPUInfo>& cpuInfo)
             }
         }
     }
-    return resCode::resOk;
+    return cpuInfo.empty() ? resCode::resErr : resCode::resOk;
 }
 
 static bool isPECIAvailable(void)
@@ -523,28 +517,22 @@ static bool pcieDeviceInDBusMap(const int& clientAddr, const int& bus,
     return false;
 }
 
-static void scanNextPCIeDevice(boost::asio::io_service& io,
-                               sdbusplus::asio::object_server& objServer,
-                               std::vector<CPUInfo>& cpuInfo, int cpu, int bus,
-                               int dev);
-
 static resCode probePCIeDevice(boost::asio::io_service& io,
                                sdbusplus::asio::object_server& objServer,
-                               std::vector<CPUInfo>& cpuInfo, int cpu, int bus,
-                               int dev)
+                               size_t addr, int cpu, int bus, int dev)
 {
     bool res;
-    resCode error = pcieDeviceExists(cpuInfo[cpu].addr, bus, dev, res);
+    resCode error = pcieDeviceExists(addr, bus, dev, res);
     if (error != resCode::resOk)
     {
         return error;
     }
     if (res)
     {
-        if (pcieDeviceInDBusMap(cpuInfo[cpu].addr, bus, dev))
+        if (pcieDeviceInDBusMap(addr, bus, dev))
         {
             // This device is already in D-Bus, so update it
-            if (updatePCIeDevice(cpuInfo[cpu].addr, bus, dev) != resCode::resOk)
+            if (updatePCIeDevice(addr, bus, dev) != resCode::resOk)
             {
                 return resCode::resErr;
             }
@@ -552,8 +540,7 @@ static resCode probePCIeDevice(boost::asio::io_service& io,
         else
         {
             // This device is not in D-Bus, so add it
-            if (addPCIeDevice(objServer, cpuInfo[cpu].addr, cpu, bus, dev) !=
-                resCode::resOk)
+            if (addPCIeDevice(objServer, addr, cpu, bus, dev) != resCode::resOk)
             {
                 return resCode::resErr;
             }
@@ -567,38 +554,50 @@ static resCode probePCIeDevice(boost::asio::io_service& io,
             return resCode::resOk;
         }
 
-        if (pcieDeviceInDBusMap(cpuInfo[cpu].addr, bus, dev))
+        if (pcieDeviceInDBusMap(addr, bus, dev))
         {
             // This device is in D-Bus, so remove it
-            removePCIeDevice(objServer, cpuInfo[cpu].addr, bus, dev);
+            removePCIeDevice(objServer, addr, bus, dev);
         }
     }
     return resCode::resOk;
 }
 
+static void scanNextPCIeDevice(boost::asio::io_service& io,
+                               sdbusplus::asio::object_server& objServer,
+                               std::vector<CPUInfo>& cpuInfo, int cpu, int bus,
+                               int dev);
 static void scanPCIeDevice(boost::asio::io_service& io,
                            sdbusplus::asio::object_server& objServer,
                            std::vector<CPUInfo>& cpuInfo, int cpu, int bus,
                            int dev)
 {
+    if (cpu >= cpuInfo.size())
+    {
+        std::cerr << "Request to scan CPU" << cpu
+                  << " while CPU array has size " << cpuInfo.size() << "\n";
+        return;
+    }
+    auto& info = cpuInfo[cpu];
     // Check if this is a CPU bus that we should skip
-    if (cpuInfo[cpu].skipCpuBuses && cpuInfo[cpu].cpuBusNums.count(bus))
+    if (info.skipCpuBuses && info.cpuBusNums.count(bus))
     {
         std::cout << "Skipping CPU " << cpu << " Bus Number " << bus << "\n";
         // Skip all the devices on this bus
         dev = peci_pcie::maxPCIDevices;
-        scanNextPCIeDevice(io, objServer, cpuInfo, cpu, bus, dev);
-        return;
     }
-
-    if (probePCIeDevice(io, objServer, cpuInfo, cpu, bus, dev) !=
-        resCode::resOk)
+    else
     {
-        std::cerr << "Failed to probe CPU " << cpu << " Bus " << bus
-                  << " Device " << dev << "\n";
+        if (probePCIeDevice(io, objServer, info.addr, cpu, bus, dev) !=
+            resCode::resOk)
+        {
+            std::cerr << "Failed to probe CPU " << cpu << " Bus " << bus
+                      << " Device " << dev << "\n";
+        }
     }
 
     scanNextPCIeDevice(io, objServer, cpuInfo, cpu, bus, dev);
+    return;
 }
 
 static void scanNextPCIeDevice(boost::asio::io_service& io,
@@ -661,9 +660,7 @@ static void peciAvailableCheck(boost::asio::steady_timer& peciWaitTimer,
                     return;
                 }
                 // get the PECI client address list
-                getClientAddrMap(cpuInfo);
-                // get the CPU Bus Numbers to skip
-                if (getCPUBusNums(cpuInfo) != resCode::resOk)
+                if (getCPUBusMap(cpuInfo) != resCode::resOk)
                 {
                     lastPECIState = false;
                     return;
@@ -717,14 +714,7 @@ static void waitForOSStandbyDelay(boost::asio::io_service& io,
                 return;
             }
             // get the PECI client address list
-            getClientAddrMap(cpuInfo);
-            if (cpuInfo.empty())
-            {
-                std::cerr << "No CPUs found, scan skipped\n";
-                return;
-            }
-            // get the CPU Bus Numbers to skip
-            if (getCPUBusNums(cpuInfo) != resCode::resOk)
+            if (getCPUBusMap(cpuInfo) != resCode::resOk)
             {
                 return;
             }
