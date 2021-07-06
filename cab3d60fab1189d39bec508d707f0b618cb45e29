@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f0d899fc_9fc68ba3",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 674,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2021-07-06T22:13:42Z",
+      "side": 1,
+      "message": "scanPCIeDevice() is called in an async loop by scanNextPCIeDevice().  The new error return is only handled for the first call on CPU 0, bus 0, device 0, function 0, but not on any others.\n\nIf the purpose of the check is to avoid calling scanPCIeDevice() when cpuInfo is empty, could you just check it before calling?\n\nIf the check is needed, you may need to add it to scanNextPCIeDevice() as well.",
+      "revId": "cab3d60fab1189d39bec508d707f0b618cb45e29",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
