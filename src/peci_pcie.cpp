@@ -264,6 +264,126 @@ static resCode getDeviceClass(const int& clientAddr, const int& bus,
     return resCode::resOk;
 }
 
+static resCode getCapStructString(const int& clientAddr, const int& bus,
+                                  const int& dev, const int& func,
+                                  const int& offset, const int& size,
+                                  std::string& res)
+{
+    uint32_t data = 0;
+    resCode error =
+        getDataFromPCIeConfig(clientAddr, bus, dev, func, offset, size, data);
+    if (error != resCode::resOk)
+    {
+        return error;
+    }
+    getStringFromData(size, data, res);
+    return resCode::resOk;
+}
+
+static resCode getPCIeType(const int& clientAddr, const int& bus,
+                           const int& dev, std::string& pcieType)
+{
+    resCode error;
+    std::string res;
+    std::string capPointer1, capPointer2, capPointer3;
+
+    error = getCapStructString(clientAddr, bus, dev, 0,
+                               peci_pcie::pointToCapStruct, 1, capPointer1);
+    if (error != resCode::resOk)
+    {
+        return error;
+    }
+
+    // Capability struct address is a pointer which point to next capability
+    // struct, so if capability struct address is 0x00 means it doesn't have
+    // next capability struct. Link speed is in 3rd Capability Struct.
+    const std::string compareString = "0x00";
+    if (capPointer1 != compareString)
+    {
+        error = getCapStructString(clientAddr, bus, dev, 0,
+                                   std::stoul(capPointer1, nullptr, 16) +
+                                       peci_pcie::capPointerOffset,
+                                   1, capPointer2);
+        if (error != resCode::resOk)
+        {
+            return error;
+        }
+        if (capPointer2 != compareString)
+        {
+            error = getCapStructString(clientAddr, bus, dev, 0,
+                                       std::stoul(capPointer2, nullptr, 16) +
+                                           peci_pcie::capPointerOffset,
+                                       1, capPointer3);
+            if (error != resCode::resOk)
+            {
+                return error;
+            }
+            if (capPointer3 != compareString)
+            {
+                // First get capability ID to identify the 3rd capability sruct
+                // is PCI Express, then get the current link speed from link
+                // status register.
+                std::string capabilityID;
+                error = getCapStructString(clientAddr, bus, dev, 0,
+                                           std::stoul(capPointer3, nullptr, 16),
+                                           1, capabilityID);
+                if (error != resCode::resOk)
+                {
+                    return error;
+                }
+                // Capability ID "0x10" is PCI Express
+                const std::string pcieCapID = "0x10";
+                if (capabilityID == pcieCapID)
+                {
+                    std::string linkStatus;
+                    error = getCapStructString(
+                        clientAddr, bus, dev, 0,
+                        std::stoul(capPointer3, nullptr, 16) +
+                            peci_pcie::linkStatusOffset,
+                        2, linkStatus);
+                    if (error != resCode::resOk)
+                    {
+                        return error;
+                    }
+
+                    uint32_t linkSpeed = std::stoul(linkStatus, nullptr, 16) &
+                                         peci_pcie::maskOfCLS;
+
+                    std::cerr << "Get current link speed, bus: " << bus
+                              << " dev: " << dev << " link speed: " << linkSpeed
+                              << std::endl;
+
+                    switch (linkSpeed)
+                    {
+                        case peci_pcie::pcieGen1:
+                            pcieType = "Gen1";
+                            break;
+                        case peci_pcie::pcieGen2:
+                            pcieType = "Gen2";
+                            break;
+                        case peci_pcie::pcieGen3:
+                            pcieType = "Gen3";
+                            break;
+                        case peci_pcie::pcieGen4:
+                            pcieType = "Gen4";
+                            break;
+                        case peci_pcie::pcieGen5:
+                            pcieType = "Gen5";
+                            break;
+                        case peci_pcie::pcieGen6:
+                            pcieType = "Gen6";
+                            break;
+                        default:
+                            std::cerr << "Link speed : " << linkSpeed
+                                      << " can not mapping to PCIe type list.";
+                    }
+                }
+            }
+        }
+    }
+    return resCode::resOk;
+}
+
 static resCode isMultiFunction(const int& clientAddr, const int& bus,
                                const int& dev, bool& res)
 {
@@ -421,6 +541,17 @@ static resCode setPCIeDeviceProperties(const int& clientAddr, const int& bus,
     {
         setPCIeProperty(clientAddr, bus, dev, deviceTypeName, "SingleFunction");
     }
+
+    // Set PCIe type
+    constexpr char const* pcieTypeName = "PcieType";
+    std::string pcieType;
+    error = getPCIeType(clientAddr, bus, dev, pcieType);
+    if (error != resCode::resOk)
+    {
+        return error;
+    }
+    setPCIeProperty(clientAddr, bus, dev, pcieTypeName, pcieType);
+
     return resCode::resOk;
 }
 
