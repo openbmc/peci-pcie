@@ -33,4 +33,27 @@ static constexpr const int maxPCIFunctions = 8;
 
 static constexpr const int peciCheckInterval = 10;
 static constexpr const int osStandbyDelaySeconds = 10;
+
+static constexpr const int pointToCapStruct = 0x34;
+static constexpr const int maskOfCLS = 0x0F;
+
+static constexpr const int capPointerOffset = 1;
+static constexpr const int linkStatusOffset = 18;
+
+// PCIe version
+// GEN1 : 0001b : transfer rate 2.5GB
+// GEN2 : 0010b : transfer rate 5GB
+// GEN3 : 0011b : transfer rate 8GB
+// GEN4 : 0100b : transfer rate 16GB
+// GEN5 : 0101b : transfer rate 32GB
+// GEN6 : 0110b : transfer rate 64GB
+enum GenerationInUse : int
+{
+    pcieGen1 = 1,
+    pcieGen2,
+    pcieGen3,
+    pcieGen4,
+    pcieGen5,
+    pcieGen6
+};
 } // namespace peci_pcie
