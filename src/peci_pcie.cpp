@@ -264,6 +264,110 @@ static resCode getDeviceClass(const int& clientAddr, const int& bus,
     return resCode::resOk;
 }
 
+static resCode getPCIeType(const int& clientAddr, const int& bus,
+                           const int& dev, std::string& pcieType)
+{
+    resCode error;
+    std::string res;
+    uint32_t capPointer1, capPointer2, capPointer3;
+
+    error = getDataFromPCIeConfig(clientAddr, bus, dev, 0,
+                                  peci_pcie::pointToCapStruct, 1, capPointer1);
+    if (error != resCode::resOk)
+    {
+        return error;
+    }
+
+    // Capability struct address is a pointer which point to next capability
+    // struct, so if capability struct address is 0 means it doesn't have
+    // next capability struct. Link speed is in 3rd Capability Struct.
+    if (capPointer1 != 0)
+    {
+        error = getDataFromPCIeConfig(clientAddr, bus, dev, 0,
+                                      capPointer1 + peci_pcie::capPointerOffset,
+                                      1, capPointer2);
+        if (error != resCode::resOk)
+        {
+            return error;
+        }
+        if (capPointer2 != 0)
+        {
+            error = getDataFromPCIeConfig(
+                clientAddr, bus, dev, 0,
+                capPointer2 + peci_pcie::capPointerOffset, 1, capPointer3);
+            if (error != resCode::resOk)
+            {
+                return error;
+            }
+            if (capPointer3 != 0)
+            {
+                // First get capability ID to identify the 3rd capability sruct
+                // is PCI Express, then get the current link speed from link
+                // status register.
+                uint32_t capabilityID;
+                error = getDataFromPCIeConfig(clientAddr, bus, dev, 0,
+                                              capPointer3, 1, capabilityID);
+                if (error != resCode::resOk)
+                {
+                    return error;
+                }
+                // Capability ID 0x10(16) is PCI Express
+                constexpr int pcieCapID = 16;
+                if (capabilityID == pcieCapID)
+                {
+                    uint32_t linkStatus;
+                    error = getDataFromPCIeConfig(
+                        clientAddr, bus, dev, 0,
+                        capPointer3 + peci_pcie::linkStatusOffset, 2,
+                        linkStatus);
+                    if (error != resCode::resOk)
+                    {
+                        return error;
+                    }
+
+                    uint32_t linkSpeed = linkStatus & peci_pcie::maskOfCLS;
+
+                    std::cerr << "Get current link speed, bus: " << bus
+                              << " dev: " << dev << " link speed: " << linkSpeed
+                              << std::endl;
+
+                    switch (linkSpeed)
+                    {
+                        case peci_pcie::pcieGen1:
+                            pcieType = "xyz.openbmc_project.Inventory.Item."
+                                       "PCIeSlot.Generations.Gen1";
+                            break;
+                        case peci_pcie::pcieGen2:
+                            pcieType = "xyz.openbmc_project.Inventory.Item."
+                                       "PCIeSlot.Generations.Gen2";
+                            break;
+                        case peci_pcie::pcieGen3:
+                            pcieType = "xyz.openbmc_project.Inventory.Item."
+                                       "PCIeSlot.Generations.Gen3";
+                            break;
+                        case peci_pcie::pcieGen4:
+                            pcieType = "xyz.openbmc_project.Inventory.Item."
+                                       "PCIeSlot.Generations.Gen4";
+                            break;
+                        case peci_pcie::pcieGen5:
+                            pcieType = "xyz.openbmc_project.Inventory.Item."
+                                       "PCIeSlot.Generations.Gen5";
+                            break;
+                        case peci_pcie::pcieGen6:
+                            pcieType = "xyz.openbmc_project.Inventory.Item."
+                                       "PCIeSlot.Generations.Gen6";
+                            break;
+                        default:
+                            std::cerr << "Link speed : " << linkSpeed
+                                      << " can not mapping to PCIe type list.";
+                    }
+                }
+            }
+        }
+    }
+    return resCode::resOk;
+}
+
 static resCode isMultiFunction(const int& clientAddr, const int& bus,
                                const int& dev, bool& res)
 {
@@ -421,6 +525,17 @@ static resCode setPCIeDeviceProperties(const int& clientAddr, const int& bus,
     {
         setPCIeProperty(clientAddr, bus, dev, deviceTypeName, "SingleFunction");
     }
+
+    // Set PCIe type
+    constexpr char const* pcieTypeName = "PcieType";
+    std::string pcieType;
+    error = getPCIeType(clientAddr, bus, dev, pcieType);
+    if (error != resCode::resOk)
+    {
+        return error;
+    }
+    setPCIeProperty(clientAddr, bus, dev, pcieTypeName, pcieType);
+
     return resCode::resOk;
 }
 
