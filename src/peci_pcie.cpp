@@ -68,6 +68,7 @@ static constexpr const std::array pciConfigInfo{
 enum class resCode
 {
     resOk,
+    resSkip,
     resErr
 };
 
@@ -258,6 +259,109 @@ static resCode getDeviceClass(const int& clientAddr, const int& bus,
     return resCode::resOk;
 }
 
+static resCode getCapReading(const int& clientAddr, const int& bus,
+                             const int& dev, uint32_t& capReading,
+                             const int compareCapID, const int offsetAddress,
+                             const int offsetLength)
+{
+    resCode error;
+    uint32_t capAddress = 0;
+    uint32_t capabilityID;
+    uint32_t nextCapPointer = peci_pcie::pointToCapStruct;
+
+    do
+    {
+        // Get capability address
+        error = getDataFromPCIeConfig(clientAddr, bus, dev, 0, nextCapPointer,
+                                      1, capAddress);
+        if (error != resCode::resOk)
+        {
+            return error;
+        }
+        // Capability struct address is a pointer which point to next capability
+        // struct, so if capability struct address is 0 means it doesn't have
+        // next capability struct.
+        if (capAddress == 0)
+        {
+            return resCode::resSkip;
+        }
+        // Get capability ID
+        error = getDataFromPCIeConfig(clientAddr, bus, dev, 0, capAddress, 1,
+                                      capabilityID);
+        if (error != resCode::resOk)
+        {
+            return error;
+        }
+        nextCapPointer = capAddress + peci_pcie::capPointerOffset;
+
+    } while (capabilityID != compareCapID);
+    // Get capability reading.
+    error = getDataFromPCIeConfig(clientAddr, bus, dev, 0,
+                                  capAddress + offsetAddress, offsetLength,
+                                  capReading);
+    if (error != resCode::resOk)
+    {
+        return error;
+    }
+    return resCode::resOk;
+}
+
+static resCode getGenerationInUse(const int& clientAddr, const int& bus,
+                                  const int& dev, std::string& generationInUse)
+{
+    resCode error;
+    std::string res;
+    uint32_t capReading = 0;
+
+    // Capability ID 0x10(16) is PCI Express
+    constexpr int pcieCapID = 16;
+    constexpr int capLength = 2;
+    uint32_t linkStatus;
+
+    error = getCapReading(clientAddr, bus, dev, linkStatus, pcieCapID,
+                          peci_pcie::linkStatusOffset, capLength);
+    if (error != resCode::resOk)
+    {
+        return error;
+    }
+
+    uint32_t linkSpeed = linkStatus & peci_pcie::maskOfCLS;
+
+    switch (linkSpeed)
+    {
+        case peci_pcie::pcieGen1:
+            generationInUse = "xyz.openbmc_project.Inventory.Item."
+                              "PCIeSlot.Generations.Gen1";
+            error = resCode::resOk;
+            break;
+        case peci_pcie::pcieGen2:
+            generationInUse = "xyz.openbmc_project.Inventory.Item."
+                              "PCIeSlot.Generations.Gen2";
+            error = resCode::resOk;
+            break;
+        case peci_pcie::pcieGen3:
+            generationInUse = "xyz.openbmc_project.Inventory.Item."
+                              "PCIeSlot.Generations.Gen3";
+            error = resCode::resOk;
+            break;
+        case peci_pcie::pcieGen4:
+            generationInUse = "xyz.openbmc_project.Inventory.Item."
+                              "PCIeSlot.Generations.Gen4";
+            error = resCode::resOk;
+            break;
+        case peci_pcie::pcieGen5:
+            generationInUse = "xyz.openbmc_project.Inventory.Item."
+                              "PCIeSlot.Generations.Gen5";
+            error = resCode::resOk;
+            break;
+        default:
+            std::cerr << "Link speed : " << linkSpeed
+                      << " can not mapping to PCIe type list.\n";
+            error = resCode::resSkip;
+    }
+    return error;
+}
+
 static resCode isMultiFunction(const int& clientAddr, const int& bus,
                                const int& dev, bool& res)
 {
@@ -415,6 +519,24 @@ static resCode setPCIeDeviceProperties(const int& clientAddr, const int& bus,
     {
         setPCIeProperty(clientAddr, bus, dev, deviceTypeName, "SingleFunction");
     }
+
+    // Set PCIe Generation
+    constexpr char const* generationInUseName = "GenerationInUse";
+    std::string generationInUse;
+    error = getGenerationInUse(clientAddr, bus, dev, generationInUse);
+    if (error == resCode::resErr)
+    {
+        return error;
+    }
+    // "resSkip" status means it can't get the capability reading, such like
+    // this device is not PCI Express.
+    if (error == resCode::resSkip)
+    {
+        setPCIeProperty(clientAddr, bus, dev, generationInUseName, "");
+        return resCode::resOk;
+    }
+    setPCIeProperty(clientAddr, bus, dev, generationInUseName, generationInUse);
+
     return resCode::resOk;
 }
 
