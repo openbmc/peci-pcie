@@ -1,0 +1,78 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "eb30a063_f6155cb6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2021-09-13T19:23:53Z",
+      "side": 1,
+      "message": "typo: management",
+      "range": {
+        "startLine": 10,
+        "startChar": 8,
+        "endLine": 10,
+        "endChar": 20
+      },
+      "revId": "c38739b3551920d8b3b8bb2613bc5926010937ee",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "76bc45e9_7dfb0a52",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2021-09-13T19:23:53Z",
+      "side": 1,
+      "message": "Instead of converting to a string here, can you keep it as data?  I think that will make comparisons below easier and will prevent having to convert it back to data with strtoul().",
+      "revId": "c38739b3551920d8b3b8bb2613bc5926010937ee",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e56fc14d_033019fd",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 301,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2021-09-13T19:23:53Z",
+      "side": 1,
+      "message": "If you waited to convert it to string, this comparison could be done with data values.",
+      "revId": "c38739b3551920d8b3b8bb2613bc5926010937ee",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "126f067a_d09edcae",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2021-09-13T19:23:53Z",
+      "side": 1,
+      "message": "Then, I think you could avoid having to convert the string back to data here.",
+      "revId": "c38739b3551920d8b3b8bb2613bc5926010937ee",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
