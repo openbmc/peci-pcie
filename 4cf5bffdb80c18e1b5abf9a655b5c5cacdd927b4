@@ -46,6 +46,30 @@
       "revId": "4cf5bffdb80c18e1b5abf9a655b5c5cacdd927b4",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b58acd84_2c5522ee",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2021-09-15T13:43:25Z",
+      "side": 1,
+      "message": "Since the property is an enumeration it should be a fully qualified string value (\"xyz.openbmc_project...Gen2\") and not just the last part (\"Gen2\").\n\nI believe we still have disagreement on the property name in the dbus interface as well.",
+      "parentUuid": "403e506f_71ddf571",
+      "range": {
+        "startLine": 25,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 85
+      },
+      "revId": "4cf5bffdb80c18e1b5abf9a655b5c5cacdd927b4",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
     }
   ]
 }
