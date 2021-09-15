@@ -22,6 +22,30 @@
       "revId": "4cf5bffdb80c18e1b5abf9a655b5c5cacdd927b4",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "403e506f_71ddf571",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1000404
+      },
+      "writtenOn": "2021-09-15T07:36:35Z",
+      "side": 1,
+      "message": "Modify the input value of \"PcieType\" property. \nI use \"xyz.openbmc_project.Inventory.Item.PCIeSlot.Generations.GenX\" as the input because we reference to the PCIeSlot enumerations in D-Bus interface. But should I modify to \"xyz.openbmc_project.Inventory.Item.PCIeDevice.Generations.GenX\" because we are setting the generation of PCIe Device? \n\nPlease correct me if I am wrong, thank you.",
+      "parentUuid": "5ef597df_d7670e0b",
+      "range": {
+        "startLine": 25,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 85
+      },
+      "revId": "4cf5bffdb80c18e1b5abf9a655b5c5cacdd927b4",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
     }
   ]
 }
