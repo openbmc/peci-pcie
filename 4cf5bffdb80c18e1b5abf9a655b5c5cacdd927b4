@@ -70,6 +70,30 @@
       "revId": "4cf5bffdb80c18e1b5abf9a655b5c5cacdd927b4",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2b70149d_8bd2a1f0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1000404
+      },
+      "writtenOn": "2021-09-16T07:36:59Z",
+      "side": 1,
+      "message": "Thank you for the information, I modify the string value and test result in patch 3, please take a look. I will update the property name when we have a conclusion.",
+      "parentUuid": "b58acd84_2c5522ee",
+      "range": {
+        "startLine": 25,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 85
+      },
+      "revId": "4cf5bffdb80c18e1b5abf9a655b5c5cacdd927b4",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
     }
   ]
 }
