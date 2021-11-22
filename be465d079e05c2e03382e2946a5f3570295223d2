@@ -46,6 +46,30 @@
       "revId": "be465d079e05c2e03382e2946a5f3570295223d2",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2b34f107_878fa45a",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 284,
+      "author": {
+        "id": 1000404
+      },
+      "writtenOn": "2021-11-22T08:31:17Z",
+      "side": 1,
+      "message": "Add a new generic function \"getCapReading\" to get the capability reading.",
+      "parentUuid": "3aa313d2_84cc5c73",
+      "range": {
+        "startLine": 284,
+        "startChar": 0,
+        "endLine": 284,
+        "endChar": 25
+      },
+      "revId": "be465d079e05c2e03382e2946a5f3570295223d2",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     }
   ]
 }
