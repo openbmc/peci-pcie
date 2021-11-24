@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "71339f66_d2dd2a91",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 263,
+      "author": {
+        "id": 1000682
+      },
+      "writtenOn": "2021-11-24T21:47:17Z",
+      "side": 1,
+      "message": "nit: usually we don\u0027t use const reference for integers. Copying integers are fairly fast. Passing pointers introducing overhead of addressing.",
+      "range": {
+        "startLine": 263,
+        "startChar": 56,
+        "endLine": 263,
+        "endChar": 64
+      },
+      "revId": "fd17681325ff9caf8dd9dc6a7f165e0032c6b4ce",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "625181ec_34382790",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 1000682
+      },
+      "writtenOn": "2021-11-24T21:47:17Z",
+      "side": 1,
+      "message": "ditto",
+      "range": {
+        "startLine": 324,
+        "startChar": 40,
+        "endLine": 324,
+        "endChar": 43
+      },
+      "revId": "fd17681325ff9caf8dd9dc6a7f165e0032c6b4ce",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2479b522_35a6aa88",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 5
+      },
+      "lineNbr": 340,
+      "author": {
+        "id": 1000682
+      },
+      "writtenOn": "2021-11-24T21:47:17Z",
+      "side": 1,
+      "message": "should these two branches be combined to \"if not ok, return error\"?",
+      "range": {
+        "startLine": 340,
+        "startChar": 17,
+        "endLine": 340,
+        "endChar": 24
+      },
+      "revId": "fd17681325ff9caf8dd9dc6a7f165e0032c6b4ce",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
