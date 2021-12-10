@@ -1,0 +1,124 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "038a093a_8d1a3241",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2021-12-10T19:59:55Z",
+      "side": 1,
+      "message": "nthStair is an int, so it can be negative.  If it must be larger than 0, you can either change it to unsigned or make this comparison \u0027nthStair \u003c\u003d 0\u0027.",
+      "revId": "9f2f867d132cab2d4ebf50f90dc814a11d12f8c5",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "30426dcc_270c8512",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2021-12-10T19:59:55Z",
+      "side": 1,
+      "message": "Instead of std::endl, please use a \u0027\\n\u0027 at the end of the string on line 270.",
+      "revId": "9f2f867d132cab2d4ebf50f90dc814a11d12f8c5",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c58f699e_c1217ee6",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2021-12-10T19:59:55Z",
+      "side": 1,
+      "message": "nit: size_t can be used here which will be unsigned.",
+      "range": {
+        "startLine": 278,
+        "startChar": 9,
+        "endLine": 278,
+        "endChar": 13
+      },
+      "revId": "9f2f867d132cab2d4ebf50f90dc814a11d12f8c5",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f840fb93_e3d4c51c",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2021-12-10T19:59:55Z",
+      "side": 1,
+      "message": "nit: Since it returns on 291 if capAddress is 0, you don\u0027t need this if which will reduce the indentation of line 295.",
+      "revId": "9f2f867d132cab2d4ebf50f90dc814a11d12f8c5",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bcfc4208_611017ad",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 320,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2021-12-10T19:59:55Z",
+      "side": 1,
+      "message": "nit: Similar to above, if you move this above line 306, you could remove the if on line 306 and reduce the indentation of lines 308 to 315.",
+      "range": {
+        "startLine": 317,
+        "startChar": 0,
+        "endLine": 320,
+        "endChar": 5
+      },
+      "revId": "9f2f867d132cab2d4ebf50f90dc814a11d12f8c5",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f8d15c34_ed3f02fb",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 334,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2021-12-10T19:59:55Z",
+      "side": 1,
+      "message": "Is this always true?  I thought we could search based only on the Capability ID without specifying the number of steps to get there?\n\nFor example, I have a PCI device in my CPU that has the PCIe Capability ID (0x10) in the first (and only) capability struct.  If I tried to go to step 3, I would get an error.",
+      "range": {
+        "startLine": 333,
+        "startChar": 3,
+        "endLine": 334,
+        "endChar": 31
+      },
+      "revId": "9f2f867d132cab2d4ebf50f90dc814a11d12f8c5",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": true
+    }
+  ]
+}
