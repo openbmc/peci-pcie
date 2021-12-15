@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "39ffc220_34ea1ee7",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 1000404
+      },
+      "writtenOn": "2021-12-15T08:33:44Z",
+      "side": 1,
+      "message": "Refer to below comment, remove \"nthStair\" here.",
+      "parentUuid": "038a093a_8d1a3241",
+      "revId": "9f2f867d132cab2d4ebf50f90dc814a11d12f8c5",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "30426dcc_270c8512",
         "filename": "src/peci_pcie.cpp",
         "patchSetId": 6
@@ -33,6 +51,24 @@
       "revId": "9f2f867d132cab2d4ebf50f90dc814a11d12f8c5",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6e06ec68_5f8c4ad5",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 1000404
+      },
+      "writtenOn": "2021-12-15T08:33:44Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "30426dcc_270c8512",
+      "revId": "9f2f867d132cab2d4ebf50f90dc814a11d12f8c5",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     },
     {
       "key": {
@@ -59,6 +95,30 @@
     },
     {
       "key": {
+        "uuid": "b17cc160_0d3aa192",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 1000404
+      },
+      "writtenOn": "2021-12-15T08:33:44Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "c58f699e_c1217ee6",
+      "range": {
+        "startLine": 278,
+        "startChar": 9,
+        "endLine": 278,
+        "endChar": 13
+      },
+      "revId": "9f2f867d132cab2d4ebf50f90dc814a11d12f8c5",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f840fb93_e3d4c51c",
         "filename": "src/peci_pcie.cpp",
         "patchSetId": 6
@@ -73,6 +133,24 @@
       "revId": "9f2f867d132cab2d4ebf50f90dc814a11d12f8c5",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "77f730de_526ea0bb",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 1000404
+      },
+      "writtenOn": "2021-12-15T08:33:44Z",
+      "side": 1,
+      "message": "Remove the if conditional.",
+      "parentUuid": "f840fb93_e3d4c51c",
+      "revId": "9f2f867d132cab2d4ebf50f90dc814a11d12f8c5",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     },
     {
       "key": {
@@ -99,6 +177,30 @@
     },
     {
       "key": {
+        "uuid": "dacb9766_3c72239b",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 320,
+      "author": {
+        "id": 1000404
+      },
+      "writtenOn": "2021-12-15T08:33:44Z",
+      "side": 1,
+      "message": "Remove the if conditional.",
+      "parentUuid": "bcfc4208_611017ad",
+      "range": {
+        "startLine": 317,
+        "startChar": 0,
+        "endLine": 320,
+        "endChar": 5
+      },
+      "revId": "9f2f867d132cab2d4ebf50f90dc814a11d12f8c5",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f8d15c34_ed3f02fb",
         "filename": "src/peci_pcie.cpp",
         "patchSetId": 6
@@ -119,6 +221,30 @@
       "revId": "9f2f867d132cab2d4ebf50f90dc814a11d12f8c5",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "62d8fe4b_2032b143",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 334,
+      "author": {
+        "id": 1000404
+      },
+      "writtenOn": "2021-12-15T08:33:44Z",
+      "side": 1,
+      "message": "Thank for your explanation. I think I misunderstand the structure of capability before, there should not have the order or steps. I rewrite the \"getCapReading\" function which only based on the Capability ID to get the reading. Please take a look, thanks!",
+      "parentUuid": "f8d15c34_ed3f02fb",
+      "range": {
+        "startLine": 333,
+        "startChar": 3,
+        "endLine": 334,
+        "endChar": 31
+      },
+      "revId": "9f2f867d132cab2d4ebf50f90dc814a11d12f8c5",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
+      "unresolved": false
     }
   ]
 }
