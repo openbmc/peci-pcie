@@ -878,13 +878,13 @@ static void monitorOSStandby(boost::asio::io_service& io,
                         return;
                     }
 
-                    if (*state == "Standby")
+                    if (state->find("Standby") != std::string::npos)
                     {
                         peci_pcie::abortScan = false;
                         waitForOSStandbyDelay(io, objServer, osStandbyTimer,
                                               cpuInfo);
                     }
-                    else if (*state == "Inactive")
+                    else if (state->find("Inactive") != std::string::npos)
                     {
                         peci_pcie::abortScan = true;
                         osStandbyTimer.cancel();
@@ -913,7 +913,7 @@ static void monitorOSStandby(boost::asio::io_service& io,
 
             // If the OS state is in Standby, then BIOS is done and we can
             // continue.  Otherwise, we just wait for the match
-            if (*state == "Standby")
+            if (state->find("Standby") != std::string::npos)
             {
                 waitForOSStandbyDelay(io, objServer, osStandbyTimer, cpuInfo);
             }
