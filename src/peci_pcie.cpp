@@ -877,14 +877,20 @@ static void monitorOSStandby(boost::asio::io_service& io,
                         std::cerr << "Unable to read OS state value\n";
                         return;
                     }
-
-                    if (*state == "Standby")
+                    // Note: Short version of OperatingSystemState value is
+                    // deprecated and would be removed in the future
+                    if ((*state == "Standby") ||
+                        (*state == "xyz.openbmc_project.State.OperatingSystem."
+                                   "Status.OSStatus.Standby"))
                     {
                         peci_pcie::abortScan = false;
                         waitForOSStandbyDelay(io, objServer, osStandbyTimer,
                                               cpuInfo);
                     }
-                    else if (*state == "Inactive")
+                    else if ((*state == "Inactive") ||
+                             (*state ==
+                              "xyz.openbmc_project.State.OperatingSystem."
+                              "Status.OSStatus.Inactive"))
                     {
                         peci_pcie::abortScan = true;
                         osStandbyTimer.cancel();
@@ -913,7 +919,12 @@ static void monitorOSStandby(boost::asio::io_service& io,
 
             // If the OS state is in Standby, then BIOS is done and we can
             // continue.  Otherwise, we just wait for the match
-            if (*state == "Standby")
+            // Note: Short version of OperatingSystemState value is deprecated
+            // and would be removed in the future
+
+            if ((*state == "Standby") ||
+                (*state == "xyz.openbmc_project.State.OperatingSystem.Status."
+                           "OSStatus.Standby"))
             {
                 waitForOSStandbyDelay(io, objServer, osStandbyTimer, cpuInfo);
             }
