@@ -16,6 +16,40 @@
       "message": "Note: See also https://gerrit.openbmc-project.xyz/c/openbmc/x86-power-control/+/49953",
       "revId": "6631444ca1b1f16aad47c46e9ba9aea27d26d70b",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f9ba05ed_c6a49ed6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2022-01-10T21:29:13Z",
+      "side": 1,
+      "message": "Looks good.  I will pull this down and test on my system.  Thanks!",
+      "revId": "6631444ca1b1f16aad47c46e9ba9aea27d26d70b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9d868927_95cf2f0e",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 881,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2022-01-10T21:29:13Z",
+      "side": 1,
+      "message": "A comment noting that \"Standby\" alone is deprecated and will be removed in the future would be good.  That will let us clean this up later and keep only the full string.",
+      "revId": "6631444ca1b1f16aad47c46e9ba9aea27d26d70b",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
