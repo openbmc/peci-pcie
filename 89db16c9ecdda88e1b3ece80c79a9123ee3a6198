@@ -1,0 +1,7 @@
+Verified+1: OpenBMC CI <openbmcbump-ci@yahoo.com>
+Code-Review+2: Jason Bills <jason.m.bills@linux.intel.com>
+Submitted-by: Patrick Williams <patrick@stwcx.xyz>
+Submitted-at: Fri, 22 Jul 2022 21:35:32 +0000
+Reviewed-on: https://gerrit.openbmc.org/c/openbmc/peci-pcie/+/55738
+Project: openbmc/peci-pcie
+Branch: refs/heads/master
