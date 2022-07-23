@@ -854,13 +854,13 @@ static void monitorOSStandby(boost::asio::io_service& io,
 {
     std::cerr << "Start OperatingSystemState Monitor\n";
 
-    static sdbusplus::bus::match::match osStateMatch(
+    static sdbusplus::bus::match_t osStateMatch(
         *conn,
         "type='signal',interface='org.freedesktop.DBus.Properties',member='"
         "PropertiesChanged',arg0='xyz.openbmc_project.State.OperatingSystem."
         "Status'",
         [&io, &objServer, &osStandbyTimer,
-         &cpuInfo](sdbusplus::message::message& msg) {
+         &cpuInfo](sdbusplus::message_t& msg) {
             // Get the OS State from the message
             std::string osStateInterface;
             boost::container::flat_map<std::string, std::variant<std::string>>
