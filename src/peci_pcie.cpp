@@ -30,6 +30,7 @@
 #include <iostream>
 #include <set>
 #include <sstream>
+#include <unordered_map>
 
 namespace peci_pcie
 {
@@ -309,6 +310,7 @@ static resCode getCapReading(const int& clientAddr, const int& bus,
 static resCode getGenerationInUse(const int& clientAddr, const int& bus,
                                   const int& dev, std::string& generationInUse)
 {
+    static std::unordered_map<uint32_t, bool> linkSpeedSkipMap;
     resCode error;
     std::string res;
     uint32_t capReading = 0;
@@ -355,8 +357,12 @@ static resCode getGenerationInUse(const int& clientAddr, const int& bus,
             error = resCode::resOk;
             break;
         default:
-            std::cerr << "Link speed : " << linkSpeed
-                      << " can not mapping to PCIe type list.\n";
+            if (!linkSpeedSkipMap[linkSpeed])
+            {
+                std::cerr << "Link speed : " << linkSpeed
+                          << " can not mapping to PCIe type list.\n";
+                linkSpeedSkipMap[linkSpeed] = true;
+            }
             error = resCode::resSkip;
     }
     return error;
