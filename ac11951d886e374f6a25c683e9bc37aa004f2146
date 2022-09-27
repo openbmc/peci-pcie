@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3c649cb2_cdc0d261",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2022-09-27T19:01:17Z",
+      "side": 1,
+      "message": "Looks good to me.  I\u0027ll leave it for a bit to see if there is additional feedback or response to my suggestion before giving +2.",
+      "revId": "ac11951d886e374f6a25c683e9bc37aa004f2146",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6bd8f522_2c9aa0d2",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2022-09-27T19:01:17Z",
+      "side": 1,
+      "message": "You might consider a std::unordered_set here and use the existence of the entry as the boolean rather than mapping to a boolean.",
+      "revId": "ac11951d886e374f6a25c683e9bc37aa004f2146",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
