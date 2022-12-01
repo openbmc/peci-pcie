@@ -41,6 +41,7 @@ static boost::container::flat_map<
     pcieDeviceDBusMap;
 
 static bool abortScan;
+static bool scanInProgress;
 
 namespace function
 {
@@ -735,6 +736,7 @@ static void scanNextPCIeDevice(boost::asio::io_service& io,
 {
     if (peci_pcie::abortScan)
     {
+        peci_pcie::scanInProgress = false;
         std::cerr << "PCIe scan aborted\n";
         return;
     }
@@ -751,6 +753,7 @@ static void scanNextPCIeDevice(boost::asio::io_service& io,
             if (++cpu >= cpuInfo.size())
             {
                 // All CPUs scanned, so we're done
+                peci_pcie::scanInProgress = false;
                 std::cerr << "PCIe scan completed\n";
                 return;
             }
@@ -759,6 +762,24 @@ static void scanNextPCIeDevice(boost::asio::io_service& io,
     boost::asio::post(io, [&io, &objServer, &cpuInfo, cpu, bus, dev]() mutable {
         scanPCIeDevice(io, objServer, cpuInfo, cpu, bus, dev);
     });
+}
+
+static void startPCIeScan(boost::asio::io_service& io,
+                          sdbusplus::asio::object_server& objServer,
+                          std::vector<CPUInfo>& cpuInfo)
+{
+    if (!peci_pcie::scanInProgress)
+    {
+        // get the PECI client address list
+        if (getCPUBusMap(cpuInfo) != resCode::resOk)
+        {
+            return;
+        }
+        std::cerr << "PCIe scan started\n";
+        // scan PCIe starting from CPU 0, Bus 0, Device 0
+        peci_pcie::scanInProgress = true;
+        scanPCIeDevice(io, objServer, cpuInfo, 0, 0, 0);
+    }
 }
 
 static void peciAvailableCheck(boost::asio::steady_timer& peciWaitTimer,
@@ -787,15 +808,7 @@ static void peciAvailableCheck(boost::asio::steady_timer& peciWaitTimer,
                     lastPECIState = false;
                     return;
                 }
-                // get the PECI client address list
-                if (getCPUBusMap(cpuInfo) != resCode::resOk)
-                {
-                    lastPECIState = false;
-                    return;
-                }
-                // scan PCIe starting from CPU 0, Bus 0, Device 0
-                std::cerr << "PCIe scan started\n";
-                scanPCIeDevice(io, objServer, cpuInfo, 0, 0, 0);
+                startPCIeScan(io, objServer, cpuInfo);
             });
     }
     else if (!peciAvailable && lastPECIState)
@@ -841,14 +854,7 @@ static void waitForOSStandbyDelay(boost::asio::io_service& io,
                           << ": " << ec.message() << "\n";
                 return;
             }
-            // get the PECI client address list
-            if (getCPUBusMap(cpuInfo) != resCode::resOk)
-            {
-                return;
-            }
-            // scan PCIe starting from CPU 0, Bus 0, Device 0
-            std::cerr << "PCIe scan started\n";
-            scanPCIeDevice(io, objServer, cpuInfo, 0, 0, 0);
+            startPCIeScan(io, objServer, cpuInfo);
         });
 }
 
