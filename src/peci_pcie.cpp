@@ -680,7 +680,7 @@ static resCode probePCIeDevice(boost::asio::io_service& io,
         // If PECI is not available, then stop scanning
         if (!isPECIAvailable())
         {
-            return resCode::resOk;
+            return resCode::resErr;
         }
 
         if (pcieDeviceInDBusMap(addr, bus, dev))
@@ -722,6 +722,7 @@ static void scanPCIeDevice(boost::asio::io_service& io,
         {
             std::cerr << "Failed to probe CPU " << cpu << " Bus " << bus
                       << " Device " << dev << "\n";
+            peci_pcie::abortScan = true;
         }
     }
 
@@ -736,6 +737,7 @@ static void scanNextPCIeDevice(boost::asio::io_service& io,
 {
     if (peci_pcie::abortScan)
     {
+        peci_pcie::abortScan = false;
         peci_pcie::scanInProgress = false;
         std::cerr << "PCIe scan aborted\n";
         return;
