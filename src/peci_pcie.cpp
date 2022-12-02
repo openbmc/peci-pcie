@@ -199,9 +199,13 @@ static resCode getDataFromPCIeConfig(const int& clientAddr, const int& bus,
                                &cc);        // PECI Completion Code
 #endif
     }
-    if (ret != PECI_CC_SUCCESS || cc != PECI_DEV_CC_SUCCESS)
+    if (ret != PECI_CC_SUCCESS)
     {
         return resCode::resErr;
+    }
+    else if (cc != PECI_DEV_CC_SUCCESS)
+    {
+        return resCode::resSkip;
     }
 
     // Now build the requested data into a single number
@@ -398,11 +402,18 @@ static resCode pcieFunctionExists(const int& clientAddr, const int& bus,
     constexpr const int pciIDOffset = 0;
     constexpr const int pciIDSize = 4;
     uint32_t pciID = 0;
+    resCode error;
     res = false;
-    if (getDataFromPCIeConfig(clientAddr, bus, dev, func, pciIDOffset,
-                              pciIDSize, pciID) != resCode::resOk)
+
+    error = getDataFromPCIeConfig(clientAddr, bus, dev, func, pciIDOffset,
+                                  pciIDSize, pciID);
+    if (error == resCode::resSkip)
     {
         return resCode::resOk;
+    }
+    else if (error == resCode::resErr)
+    {
+        return resCode::resErr;
     }
 
     // if VID and DID are all 0s or 1s, then the device doesn't exist
@@ -680,7 +691,7 @@ static resCode probePCIeDevice(boost::asio::io_service& io,
         // If PECI is not available, then stop scanning
         if (!isPECIAvailable())
         {
-            return resCode::resOk;
+            return resCode::resErr;
         }
 
         if (pcieDeviceInDBusMap(addr, bus, dev))
@@ -722,6 +733,7 @@ static void scanPCIeDevice(boost::asio::io_service& io,
         {
             std::cerr << "Failed to probe CPU " << cpu << " Bus " << bus
                       << " Device " << dev << "\n";
+            peci_pcie::abortScan = true;
         }
     }
 
@@ -773,11 +785,13 @@ static void startPCIeScan(boost::asio::io_service& io,
         // get the PECI client address list
         if (getCPUBusMap(cpuInfo) != resCode::resOk)
         {
+            peci_pcie::abortScan = true;
             return;
         }
         std::cerr << "PCIe scan started\n";
         // scan PCIe starting from CPU 0, Bus 0, Device 0
         peci_pcie::scanInProgress = true;
+        peci_pcie::abortScan = false;
         scanPCIeDevice(io, objServer, cpuInfo, 0, 0, 0);
     }
 }
@@ -789,27 +803,27 @@ static void peciAvailableCheck(boost::asio::steady_timer& peciWaitTimer,
 {
     static bool lastPECIState = false;
     bool peciAvailable = isPECIAvailable();
-    if (peciAvailable && !lastPECIState)
+    if (peciAvailable && (!lastPECIState || peci_pcie::abortScan))
     {
         lastPECIState = true;
-        static boost::asio::steady_timer pcieTimeout(io);
+        auto pcieTimeout = std::make_shared<boost::asio::steady_timer>(io);
         constexpr const int pcieWaitTime = 60;
-        pcieTimeout.expires_after(std::chrono::seconds(pcieWaitTime));
-        pcieTimeout.async_wait(
-            [&io, &objServer, &cpuInfo](const boost::system::error_code& ec) {
-                if (ec)
+        pcieTimeout->expires_after(std::chrono::seconds(pcieWaitTime));
+        pcieTimeout->async_wait([&io, &objServer, &cpuInfo, pcieTimeout](
+                                    const boost::system::error_code& ec) {
+            if (ec)
+            {
+                // operation_aborted is expected if timer is canceled
+                // before completion.
+                if (ec != boost::asio::error::operation_aborted)
                 {
-                    // operation_aborted is expected if timer is canceled
-                    // before completion.
-                    if (ec != boost::asio::error::operation_aborted)
-                    {
-                        std::cerr << "PECI PCIe async_wait failed " << ec;
-                    }
-                    lastPECIState = false;
-                    return;
+                    std::cerr << "PECI PCIe async_wait failed " << ec;
                 }
-                startPCIeScan(io, objServer, cpuInfo);
-            });
+                lastPECIState = false;
+                return;
+            }
+            startPCIeScan(io, objServer, cpuInfo);
+        });
     }
     else if (!peciAvailable && lastPECIState)
     {
