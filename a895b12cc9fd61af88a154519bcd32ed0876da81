@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "95dce2bd_4b930277",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2022-12-05T15:48:37Z",
+      "side": 1,
+      "message": "Looks good to me.  I\u0027ll leave at +1 for a bit to give others a chance to provide feedback before promoting to +2.",
+      "revId": "a895b12cc9fd61af88a154519bcd32ed0876da81",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
