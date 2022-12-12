@@ -16,6 +16,23 @@
       "message": "Looks good to me.  I\u0027ll leave at +1 for a bit to give others a chance to provide feedback before promoting to +2.",
       "revId": "ce6366e721153a50b53df675eb85a85298d21fb9",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a81e01e_554ba456",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000936
+      },
+      "writtenOn": "2022-12-12T10:57:01Z",
+      "side": 1,
+      "message": "Not ready for merge yet, our QA managed to expose another race. Working on it.\nFWIW, the reproduction path is something like going to UEFI menu and then resetting the host from there at about the time this daemon reports the scan started.",
+      "revId": "ce6366e721153a50b53df675eb85a85298d21fb9",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
