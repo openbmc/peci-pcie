@@ -43,6 +43,8 @@ static boost::container::flat_map<
 static bool abortScan;
 static bool scanInProgress;
 
+constexpr const bool debug = false;
+
 namespace function
 {
 static constexpr char const* functionTypeName = "FunctionType";
@@ -198,6 +200,12 @@ static resCode getDataFromPCIeConfig(const int& clientAddr, const int& bus,
                                data.data(), // PCI Read Data
                                &cc);        // PECI Completion Code
 #endif
+        if constexpr (debug)
+        {
+            std::cerr << "Request: bus " << bus << " dev " << dev << " func "
+                      << func << " pciOffset " << pciOffset << " ret: " << ret
+                      << " cc: " << static_cast<int>(cc) << "\n";
+        }
     }
     if (ret != PECI_CC_SUCCESS)
     {
@@ -782,6 +790,7 @@ static void startPCIeScan(boost::asio::io_service& io,
     if (!peci_pcie::scanInProgress)
     {
         // get the PECI client address list
+        std::cerr << "Getting map\n";
         if (getCPUBusMap(cpuInfo) != resCode::resOk)
         {
             peci_pcie::abortScan = true;
@@ -802,11 +811,20 @@ static void peciAvailableCheck(boost::asio::steady_timer& peciWaitTimer,
 {
     static bool lastPECIState = false;
     bool peciAvailable = isPECIAvailable();
+    if constexpr (debug)
+    {
+        std::cerr << "peciAvailableCheck " << peciAvailable << " "
+                  << lastPECIState << " " << peci_pcie::abortScan << "\n";
+    }
     if (peciAvailable && (!lastPECIState || peci_pcie::abortScan))
     {
         lastPECIState = true;
         auto pcieTimeout = std::make_shared<boost::asio::steady_timer>(io);
         constexpr const int pcieWaitTime = 60;
+        if constexpr (debug)
+        {
+            std::cerr << "Scanning in 60 seconds\n";
+        }
         pcieTimeout->expires_after(std::chrono::seconds(pcieWaitTime));
         pcieTimeout->async_wait([&io, &objServer, &cpuInfo, pcieTimeout](
                                     const boost::system::error_code& ec) {
