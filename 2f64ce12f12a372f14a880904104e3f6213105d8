@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "33e58830_e33558e3",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 408,
+      "author": {
+        "id": 1000885
+      },
+      "writtenOn": "2022-12-16T20:12:29Z",
+      "side": 1,
+      "message": "Just do\n```\nresCode error \u003d getDataFromPCIeConfig(...)\n```",
+      "range": {
+        "startLine": 408,
+        "startChar": 4,
+        "endLine": 408,
+        "endChar": 11
+      },
+      "revId": "2f64ce12f12a372f14a880904104e3f6213105d8",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
