@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "75b05d80_2f03d49d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000936
+      },
+      "writtenOn": "2022-12-16T12:30:08Z",
+      "side": 1,
+      "message": "Hi Willy,\nFrom the git log I guess you have a real life use-case for this app. It would be nice if you had a chance to check if this whole patch series is working properly on your hardware and doesn\u0027t break anything you care about. Appreciate your feedback.",
+      "revId": "ab27aeb4d8032dd5ea490baf8a0f0930fb4a8c99",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
