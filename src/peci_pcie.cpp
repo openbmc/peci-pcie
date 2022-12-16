@@ -177,7 +177,7 @@ static resCode getDataFromPCIeConfig(const int& clientAddr, const int& bus,
     std::array<uint8_t, pciReadSize> data;
     uint8_t cc;
     int ret = PECI_CC_TIMEOUT;
-    for (int index = 0; (index < 5) && (ret == PECI_CC_TIMEOUT); index++)
+    for (int index = 0; (index < 15) && (ret == PECI_CC_TIMEOUT); index++)
     {
 #ifdef USE_RDENDPOINTCFG
         ret = peci_RdEndPointConfigPci(clientAddr,  // CPU Address
