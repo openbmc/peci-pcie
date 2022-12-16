@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b67e7faf_d9fe09f2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000936
+      },
+      "writtenOn": "2022-12-16T12:26:59Z",
+      "side": 1,
+      "message": "The CI failure is due to new checks for the existing Markdown and Python code, unrelated to this change.",
+      "revId": "2fdf4795d6c89db55ca469f2ec399c4dbacab147",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
