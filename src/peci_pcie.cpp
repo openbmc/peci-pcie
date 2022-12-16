@@ -14,6 +14,8 @@
 // limitations under the License.
 */
 
+//#define DEBUG 1
+
 #include "peci_pcie.hpp"
 
 #include "pciDeviceClass.hpp"
@@ -197,6 +199,11 @@ static resCode getDataFromPCIeConfig(const int& clientAddr, const int& bus,
                                pciOffset,   // PCI Offset
                                data.data(), // PCI Read Data
                                &cc);        // PECI Completion Code
+#endif
+#ifdef DEBUG
+        std::cout << "Request: bus " << bus << " dev " << dev << " func "
+                  << func << " pciOffset " << pciOffset << " ret: " << ret
+                  << " cc: " << static_cast<int>(cc) << std::endl;
 #endif
     }
     if (ret != PECI_CC_SUCCESS)
@@ -783,6 +790,9 @@ static void startPCIeScan(boost::asio::io_service& io,
     if (!peci_pcie::scanInProgress)
     {
         // get the PECI client address list
+#ifdef DEBUG
+        std::cout << "Getting map\n";
+#endif
         if (getCPUBusMap(cpuInfo) != resCode::resOk)
         {
             peci_pcie::abortScan = true;
@@ -803,11 +813,18 @@ static void peciAvailableCheck(boost::asio::steady_timer& peciWaitTimer,
 {
     static bool lastPECIState = false;
     bool peciAvailable = isPECIAvailable();
+#ifdef DEBUG
+    std::cout << "peciAvailableCheck " << peciAvailable << " " << lastPECIState
+              << " " << peci_pcie::abortScan << std::endl;
+#endif
     if (peciAvailable && (!lastPECIState || peci_pcie::abortScan))
     {
         lastPECIState = true;
         auto pcieTimeout = std::make_shared<boost::asio::steady_timer>(io);
         constexpr const int pcieWaitTime = 60;
+#ifdef DEBUG
+        std::cout << "Scanning in 60 seconds\n";
+#endif
         pcieTimeout->expires_after(std::chrono::seconds(pcieWaitTime));
         pcieTimeout->async_wait([&io, &objServer, &cpuInfo, pcieTimeout](
                                     const boost::system::error_code& ec) {
