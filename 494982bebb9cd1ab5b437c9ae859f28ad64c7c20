@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d98d380b_efddb678",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000936
+      },
+      "writtenOn": "2022-12-17T09:06:00Z",
+      "side": 1,
+      "message": "Thank you for taking a look indeed.\nI wonder how come in your testing of the previous versions you weren\u0027t occassionally getting bogus data (extra random devices visible on D-Bus and via Redfish) due to concurrent scans, and whether my changes do not affect your platform negatively. Do you also get transient PECI timeouts with an idle host (CPUs in C6) and some UEFI early boot stages?\nBTW, all our tests were performed with default compile-time settings, that is, WAIT_FOR_OS_STANDBY not enabled and USE_RDENDPOINTCFG off.",
+      "revId": "494982bebb9cd1ab5b437c9ae859f28ad64c7c20",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
