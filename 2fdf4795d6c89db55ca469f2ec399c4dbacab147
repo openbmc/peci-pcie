@@ -34,6 +34,24 @@
       "parentUuid": "b67e7faf_d9fe09f2",
       "revId": "2fdf4795d6c89db55ca469f2ec399c4dbacab147",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3c3e9ddd_5e1282b0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000936
+      },
+      "writtenOn": "2022-12-17T08:55:50Z",
+      "side": 1,
+      "message": "Sure, just rebasing on top of master tip was enough. I prefer to have new patchset versions pushed separately from rebases to make it easier to compare between the versions.",
+      "parentUuid": "67d85afc_c907c5ec",
+      "revId": "2fdf4795d6c89db55ca469f2ec399c4dbacab147",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
