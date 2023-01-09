@@ -133,6 +133,30 @@
       },
       "revId": "494982bebb9cd1ab5b437c9ae859f28ad64c7c20",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e06c90c1_2e3b62ba",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 815,
+      "author": {
+        "id": 1000936
+      },
+      "writtenOn": "2023-01-09T15:52:47Z",
+      "side": 1,
+      "message": "There\u0027s an interesting related detail: for std::cerr specifically \"Once initialized, (std::cerr.flags() \u0026 unitbuf) !\u003d 0 (same for wcerr) meaning that any output sent to these stream objects is immediately flushed to the OS\", so \"\\n\" wouldn\u0027t avoid the extra flush in this case. That said, I agree it\u0027s better to always use \"\\n\" for consistency (or probably if we are nit picking performance then \u0027\\n\u0027 would be even more better?)",
+      "parentUuid": "aff7146f_ee3610a8",
+      "range": {
+        "startLine": 815,
+        "startChar": 48,
+        "endLine": 815,
+        "endChar": 57
+      },
+      "revId": "494982bebb9cd1ab5b437c9ae859f28ad64c7c20",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
