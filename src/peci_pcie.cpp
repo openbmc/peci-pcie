@@ -19,7 +19,7 @@
 #include "pciDeviceClass.hpp"
 #include "pciVendors.hpp"
 
-#include <boost/asio/io_service.hpp>
+#include <boost/asio/io_context.hpp>
 #include <boost/asio/steady_timer.hpp>
 #include <boost/container/flat_map.hpp>
 #include <boost/container/flat_set.hpp>
@@ -664,7 +664,7 @@ static bool pcieDeviceInDBusMap(const int& clientAddr, const int& bus,
     return false;
 }
 
-static resCode probePCIeDevice(boost::asio::io_service& io,
+static resCode probePCIeDevice(boost::asio::io_context& io,
                                sdbusplus::asio::object_server& objServer,
                                size_t addr, int cpu, int bus, int dev)
 {
@@ -710,11 +710,11 @@ static resCode probePCIeDevice(boost::asio::io_service& io,
     return resCode::resOk;
 }
 
-static void scanNextPCIeDevice(boost::asio::io_service& io,
+static void scanNextPCIeDevice(boost::asio::io_context& io,
                                sdbusplus::asio::object_server& objServer,
                                std::vector<CPUInfo>& cpuInfo, int cpu, int bus,
                                int dev);
-static void scanPCIeDevice(boost::asio::io_service& io,
+static void scanPCIeDevice(boost::asio::io_context& io,
                            sdbusplus::asio::object_server& objServer,
                            std::vector<CPUInfo>& cpuInfo, int cpu, int bus,
                            int dev)
@@ -748,7 +748,7 @@ static void scanPCIeDevice(boost::asio::io_service& io,
     return;
 }
 
-static void scanNextPCIeDevice(boost::asio::io_service& io,
+static void scanNextPCIeDevice(boost::asio::io_context& io,
                                sdbusplus::asio::object_server& objServer,
                                std::vector<CPUInfo>& cpuInfo, int cpu, int bus,
                                int dev)
@@ -783,7 +783,7 @@ static void scanNextPCIeDevice(boost::asio::io_service& io,
     });
 }
 
-static void startPCIeScan(boost::asio::io_service& io,
+static void startPCIeScan(boost::asio::io_context& io,
                           sdbusplus::asio::object_server& objServer,
                           std::vector<CPUInfo>& cpuInfo)
 {
@@ -805,7 +805,7 @@ static void startPCIeScan(boost::asio::io_service& io,
 }
 
 static void peciAvailableCheck(boost::asio::steady_timer& peciWaitTimer,
-                               boost::asio::io_service& io,
+                               boost::asio::io_context& io,
                                sdbusplus::asio::object_server& objServer,
                                std::vector<CPUInfo>& cpuInfo)
 {
@@ -865,7 +865,7 @@ static void peciAvailableCheck(boost::asio::steady_timer& peciWaitTimer,
     });
 }
 
-static void waitForOSStandbyDelay(boost::asio::io_service& io,
+static void waitForOSStandbyDelay(boost::asio::io_context& io,
                                   sdbusplus::asio::object_server& objServer,
                                   boost::asio::steady_timer& osStandbyTimer,
                                   std::vector<CPUInfo>& cpuInfo)
@@ -889,7 +889,7 @@ static void waitForOSStandbyDelay(boost::asio::io_service& io,
         });
 }
 
-static void monitorOSStandby(boost::asio::io_service& io,
+static void monitorOSStandby(boost::asio::io_context& io,
                              std::shared_ptr<sdbusplus::asio::connection> conn,
                              sdbusplus::asio::object_server& objServer,
                              boost::asio::steady_timer& osStandbyTimer,
@@ -981,7 +981,7 @@ static void monitorOSStandby(boost::asio::io_service& io,
 int main(int argc, char* argv[])
 {
     // setup connection to dbus
-    boost::asio::io_service io;
+    boost::asio::io_context io;
     std::shared_ptr<sdbusplus::asio::connection> conn =
         std::make_shared<sdbusplus::asio::connection>(io);
 
