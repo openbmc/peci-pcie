@@ -33,6 +33,23 @@
       "message": "Search shows this matches https://gerrit.openbmc.org/c/openbmc/bmcweb/+/62064/1/redfish-core/lib/pcie.hpp#37",
       "revId": "32214d32b5be5ccbc9d3e8d3467dc962cf9365a0",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ebc54fd3_fd0fcb55",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000926
+      },
+      "writtenOn": "2023-04-03T20:53:54Z",
+      "side": 1,
+      "message": "I don\u0027t have a real system with PECI to test this either, but I was trying to investigate this subject myself. If I understand the bmcweb code correctly https://github.com/openbmc/bmcweb/blob/a1cbc1920833ae7f7cf9c2e7df06e37dc7f9f530/redfish-core/lib/pcie.hpp#L105\n```\n    constexpr std::array\u003cstd::string_view, 1\u003e interfaces{\n        \"xyz.openbmc_project.Inventory.Item.PCIeDevice\"};\n    collection_util::getCollectionMembers(\n        aResp, boost::urls::url(\"/redfish/v1/Systems/system/PCIeDevices\"),\n        interfaces);\n```       \n\nThe PCIe objects are expected to be under the \u0027/xyz/openbmc_project/inventory\u0027 by default\nhttps://github.com/openbmc/bmcweb/blob/a1cbc1920833ae7f7cf9c2e7df06e37dc7f9f530/redfish-core/include/utils/collection.hpp#L35 since \u0027getCollectionMembers\u0027 looks like this\n```\ninline void\n    getCollectionMembers(std::shared_ptr\u003cbmcweb::AsyncResp\u003e aResp,\n                         const boost::urls::url\u0026 collectionPath,\n                         std::span\u003cconst std::string_view\u003e interfaces,\n                         const char* subtree \u003d \"/xyz/openbmc_project/inventory\")\n```\n\nand \u0027peci-pcie\u0027 creates the objects under the \u0027/xyz/openbmc_project/PCIe/\u0027 (https://github.com/openbmc/peci-pcie/blob/985d9d9e2d7a870b4c160fc297df38ca8bdd1e3c/include/peci_pcie.hpp#L26)\n```\nstatic constexpr char const* peciPCIePath \u003d \"/xyz/openbmc_project/PCIe\";\n```\n\nShould it be changed as well? I.e.\n```\n- static constexpr char const* peciPCIePath \u003d \"/xyz/openbmc_project/PCIe\";\n+ static constexpr char const* peciPCIePath \u003d \"/xyz/openbmc_project/inventory\";\n```",
+      "revId": "32214d32b5be5ccbc9d3e8d3467dc962cf9365a0",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
