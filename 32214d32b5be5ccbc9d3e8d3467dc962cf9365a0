@@ -67,6 +67,24 @@
       "message": "Wouldn’t this need to be inventory too?",
       "revId": "32214d32b5be5ccbc9d3e8d3467dc962cf9365a0",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4be848a0_50e4e5d9",
+        "filename": "include/peci_pcie.hpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1001633
+      },
+      "writtenOn": "2023-04-05T21:36:42Z",
+      "side": 1,
+      "message": "Changed peciPCIePath to \"\"/xyz/openbmc_project/inventory\"",
+      "parentUuid": "344febf1_68c7c30b",
+      "revId": "32214d32b5be5ccbc9d3e8d3467dc962cf9365a0",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
