@@ -106,6 +106,24 @@
       "parentUuid": "2937ac2a_73588328",
       "revId": "ffd197a114e6bc99d6dba77fec9becb7c73f244e",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "50df6929_a055db4f",
+        "filename": "include/peci_pcie.hpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1001633
+      },
+      "writtenOn": "2023-04-06T19:46:51Z",
+      "side": 1,
+      "message": "Jason, could you please help me verify the correct peciPCIePath? \nCurrently, the addPCIeDevice() function appends \"/S\u003ccpu\u003eB\u003cbus\u003eD\u003cdevice\u003e\" to peciPCIePath to create the object path for the new PCIe device. However, it\u0027s unclear if peciPCIePath is set to the correct inventory path. Can you please confirm the correct peciPCIePath value?",
+      "parentUuid": "018cd631_815cb2cb",
+      "revId": "ffd197a114e6bc99d6dba77fec9becb7c73f244e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
