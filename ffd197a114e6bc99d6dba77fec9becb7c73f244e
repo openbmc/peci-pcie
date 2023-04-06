@@ -88,6 +88,24 @@
       "parentUuid": "d6080d74_8705028e",
       "revId": "ffd197a114e6bc99d6dba77fec9becb7c73f244e",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "018cd631_815cb2cb",
+        "filename": "include/peci_pcie.hpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2023-04-06T19:24:16Z",
+      "side": 1,
+      "message": "peciPCIePath isn\u0027t the inventory path. It should start with the inventory path but I think \"/xyz/openbmc_project/inventory/pcie\" if this is changed",
+      "parentUuid": "2937ac2a_73588328",
+      "revId": "ffd197a114e6bc99d6dba77fec9becb7c73f244e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
