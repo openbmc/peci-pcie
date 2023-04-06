@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b4597e39_82465d98",
+        "filename": "include/peci_pcie.hpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1000926
+      },
+      "writtenOn": "2023-04-06T14:36:41Z",
+      "side": 1,
+      "message": "If we just change it like that the current version of the `getPCIeDeviceList` would return incorrect objects.\n\n`getPCIeDeviceList` uses `getSubTreePaths` call to object mapper to get objects under the `peciPCIePath` which in our case would result to:\n\nroot@ethanolx:~# busctl call xyz.openbmc_project.ObjectMapper /xyz/openbmc_project/object_mapper xyz.openbmc_project.ObjectMapper GetSubTreePaths sias /xyz/openbmc_project/inventory/ 1 0\nas 3 \"/xyz/openbmc_project/inventory/MyDev\" \"/xyz/openbmc_project/inventory/MyDev1\" \"/xyz/openbmc_project/inventory/system\"\n\nAs you can see the \"/xyz/openbmc_project/inventory/system\" is incorrectly returned from that call.\n\nTo fix it, we need to add \"interface\" constrain to the `getSubTreePaths` call:\n\nroot@ethanolx:~# busctl call xyz.openbmc_project.ObjectMapper /xyz/openbmc_project/object_mapper xyz.openbmc_project.ObjectMapper GetSubTreePaths sias /xyz/openbmc_project/inventory/ 1 1 \"xyz.openbmc_project.Inventory.Item.PCIeDevice\"\nas 2 \"/xyz/openbmc_project/inventory/MyDev\" \"/xyz/openbmc_project/inventory/MyDev1\"\n\n\n\nPlease add `peciPCIePath` to the `getSubTreePaths` call inside the `getPCIeDeviceList` function.\n\nhttps://github.com/openbmc/bmcweb/blob/2ec5b14d046e287c740ef59360f3d7637efb8085/redfish-core/lib/pcie.hpp#L43",
+      "revId": "ffd197a114e6bc99d6dba77fec9becb7c73f244e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
