@@ -34,10 +34,16 @@
 
 namespace peci_pcie
 {
+
+struct PcieInterfaces
+{
+    std::shared_ptr<sdbusplus::asio::dbus_interface> deviceIface;
+    std::shared_ptr<sdbusplus::asio::dbus_interface> assetIface;
+};
+
 static boost::container::flat_map<
     int, boost::container::flat_map<
-             int, boost::container::flat_map<
-                      int, std::shared_ptr<sdbusplus::asio::dbus_interface>>>>
+             int, boost::container::flat_map<int, PcieInterfaces>>>
     pcieDeviceDBusMap;
 
 static bool abortScan;
@@ -442,8 +448,18 @@ static resCode setPCIeProperty(const int& clientAddr, const int& bus,
                                const int& dev, const std::string& propertyName,
                                const std::string& propertyValue)
 {
-    std::shared_ptr<sdbusplus::asio::dbus_interface> iface =
+    peci_pcie::PcieInterfaces pcieIfaces =
         peci_pcie::pcieDeviceDBusMap[clientAddr][bus][dev];
+
+    std::shared_ptr<sdbusplus::asio::dbus_interface> iface;
+    if (propertyName == "Manufacturer")
+    {
+        iface = pcieIfaces.assetIface;
+    }
+    else
+    {
+        iface = pcieIfaces.deviceIface;
+    }
 
     if (iface->is_initialized())
     {
@@ -604,10 +620,11 @@ static void removePCIeDevice(sdbusplus::asio::object_server& objServer,
                              const int& clientAddr, const int& bus,
                              const int& dev)
 {
-    std::shared_ptr<sdbusplus::asio::dbus_interface> iface =
+    peci_pcie::PcieInterfaces ifaces =
         peci_pcie::pcieDeviceDBusMap[clientAddr][bus][dev];
 
-    objServer.remove_interface(iface);
+    objServer.remove_interface(ifaces.deviceIface);
+    objServer.remove_interface(ifaces.assetIface);
 
     peci_pcie::pcieDeviceDBusMap[clientAddr][bus].erase(dev);
     if (peci_pcie::pcieDeviceDBusMap[clientAddr][bus].empty())
@@ -627,9 +644,12 @@ static resCode addPCIeDevice(sdbusplus::asio::object_server& objServer,
     std::string pathName = std::string(peci_pcie::peciPCIePath) + "/S" +
                            std::to_string(cpu) + "B" + std::to_string(bus) +
                            "D" + std::to_string(dev);
-    std::shared_ptr<sdbusplus::asio::dbus_interface> iface =
+    peci_pcie::PcieInterfaces ifaces;
+    ifaces.deviceIface =
         objServer.add_interface(pathName, peci_pcie::peciPCIeDeviceInterface);
-    peci_pcie::pcieDeviceDBusMap[clientAddr][bus][dev] = iface;
+    ifaces.assetIface =
+        objServer.add_interface(pathName, peci_pcie::peciPCIeAssetInterface);
+    peci_pcie::pcieDeviceDBusMap[clientAddr][bus][dev] = ifaces;
 
     // Update the properties for the new device
     if (updatePCIeDevice(clientAddr, bus, dev) != resCode::resOk)
@@ -638,7 +658,8 @@ static resCode addPCIeDevice(sdbusplus::asio::object_server& objServer,
         return resCode::resErr;
     }
 
-    iface->initialize();
+    ifaces.deviceIface->initialize();
+    ifaces.assetIface->initialize();
     return resCode::resOk;
 }
 
@@ -654,7 +675,8 @@ static bool pcieDeviceInDBusMap(const int& clientAddr, const int& bus,
             if (auto devIt = busIt->second.find(dev);
                 devIt != busIt->second.end())
             {
-                if (devIt->second)
+                if (devIt->second.deviceIface != nullptr ||
+                    devIt->second.assetIface != nullptr)
                 {
                     return true;
                 }

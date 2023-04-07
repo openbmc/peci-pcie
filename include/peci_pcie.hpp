@@ -27,6 +27,8 @@ static constexpr const char* peciPCIePath =
     "/xyz/openbmc_project/inventory/pcie";
 static constexpr const char* peciPCIeDeviceInterface =
     "xyz.openbmc_project.Inventory.Item.PCIeDevice";
+static constexpr char const* peciPCIeAssetInterface =
+    "xyz.openbmc_project.Inventory.Decorator.Asset";
 
 static constexpr const int maxPCIBuses = 256;
 static constexpr const int maxPCIDevices = 32;
