@@ -142,6 +142,24 @@
       "parentUuid": "50df6929_a055db4f",
       "revId": "ffd197a114e6bc99d6dba77fec9becb7c73f244e",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f0bc2f71_f82d1482",
+        "filename": "include/peci_pcie.hpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2023-04-10T21:18:27Z",
+      "side": 1,
+      "message": "I\u0027m not up on the latest inventory path discussion, but I trust Gunnar on that, so this path looks good to me.\n\nI tested the change on my system and confirmed that with the following minor change on the bmcweb review, this gives the same results under /redfish/v1/Systems/system/PCIeDevices as the current code:\n```\ndiff --git a/redfish-core/lib/pcie.hpp b/redfish-core/lib/pcie.hpp\nindex 7cea8409..a824bff2 100644\n--- a/redfish-core/lib/pcie.hpp\n+++ b/redfish-core/lib/pcie.hpp\n@@ -32,7 +32,7 @@ namespace redfish\n {\n\n static constexpr char const* pcieService \u003d \"xyz.openbmc_project.PCIe\";\n-static constexpr char const* pciePath \u003d \"/xyz/openbmc_project/PCIe\";\n+static constexpr char const* pciePath \u003d \"/xyz/openbmc_project/inventory/pcie\";\n static constexpr char const* pcieDeviceInterface \u003d\n     \"xyz.openbmc_project.Inventory.Item.PCIeDevice\";\n\n\n```",
+      "parentUuid": "c3e93b7f_40742936",
+      "revId": "ffd197a114e6bc99d6dba77fec9becb7c73f244e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
