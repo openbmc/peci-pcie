@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "07dcb113_edd1b2f3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2023-04-10T21:20:59Z",
+      "side": 1,
+      "message": "Code-wise this looks good.  I think it will require a corresponding change on bmcweb to search for the \"Manufacturer\" property under the D-Bus Asset interface.\n\nAlso, it looks like it still assumes the manufacturer from the VendorID, which I think Patrick was suggesting was not correct.  However, since that\u0027s the current behavior, it could be done in a separate change.",
+      "revId": "961d74208ce42dc616fe3e83bfb765807d1023b3",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
