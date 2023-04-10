@@ -160,6 +160,24 @@
       "parentUuid": "c3e93b7f_40742936",
       "revId": "ffd197a114e6bc99d6dba77fec9becb7c73f244e",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e31288e_e08fe908",
+        "filename": "include/peci_pcie.hpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1001633
+      },
+      "writtenOn": "2023-04-10T21:55:43Z",
+      "side": 1,
+      "message": "Hi Jason, \n\nThanks for testing.\n\nThe D-Bus object path of the subtree to search should be \"/xyz/openbmc_project/inventory\", which is the root path for all inventory objects. PCIe objects can be created in different locations within the inventory path, and the implementation-specific paths should be taken into consideration when searching for PCIe devices. \nThe code in the following commit contains all the changes needed to work with both peci-pcie and IBM implementations. Can you please test with the following commit \n\nhttps://gerrit.openbmc.org/c/openbmc/bmcweb/+/61786",
+      "parentUuid": "f0bc2f71_f82d1482",
+      "revId": "ffd197a114e6bc99d6dba77fec9becb7c73f244e",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
