@@ -1,0 +1,9 @@
+Verified+1: OpenBMC CI <openbmcbump-ci@yahoo.com>
+Code-Review+1: Gunnar Mills <gmills@us.ibm.com>
+Code-Review+2: Jason Bills <jason.m.bills@linux.intel.com>
+Code-Review+1: Willy Tu <wltu@google.com>
+Submitted-by: Lakshmi Yadlapati <lakshmiy@us.ibm.com>
+Submitted-at: Fri, 28 Apr 2023 20:35:35 +0000
+Reviewed-on: https://gerrit.openbmc.org/c/openbmc/peci-pcie/+/62100
+Project: openbmc/peci-pcie
+Branch: refs/heads/master
