@@ -19,8 +19,8 @@
 
 #include <string>
 
-static constexpr char const* coprocessorSubClass = "Coprocessor";
-static constexpr char const* otherClass = "Other";
+static constexpr const char* coprocessorSubClass = "Coprocessor";
+static constexpr const char* otherClass = "Other";
 
 static boost::container::flat_map<int, std::string> pciDeviceClasses{
     {0x00, "UnclassifiedDevice"},

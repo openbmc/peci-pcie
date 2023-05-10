@@ -47,14 +47,14 @@ constexpr const bool debug = false;
 
 namespace function
 {
-static constexpr char const* functionTypeName = "FunctionType";
-static constexpr char const* deviceClassName = "DeviceClass";
-static constexpr char const* vendorIdName = "VendorId";
-static constexpr char const* deviceIdName = "DeviceId";
-static constexpr char const* classCodeName = "ClassCode";
-static constexpr char const* revisionIdName = "RevisionId";
-static constexpr char const* subsystemIdName = "SubsystemId";
-static constexpr char const* subsystemVendorIdName = "SubsystemVendorId";
+static constexpr const char* functionTypeName = "FunctionType";
+static constexpr const char* deviceClassName = "DeviceClass";
+static constexpr const char* vendorIdName = "VendorId";
+static constexpr const char* deviceIdName = "DeviceId";
+static constexpr const char* classCodeName = "ClassCode";
+static constexpr const char* revisionIdName = "RevisionId";
+static constexpr const char* subsystemIdName = "SubsystemId";
+static constexpr const char* subsystemVendorIdName = "SubsystemVendorId";
 } // namespace function
 
 static constexpr const std::array pciConfigInfo{
@@ -529,7 +529,7 @@ static resCode setPCIeDeviceProperties(const int& clientAddr, const int& bus,
     setPCIeProperty(clientAddr, bus, dev, "Manufacturer", manuf);
 
     // Set the device type
-    constexpr char const* deviceTypeName = "DeviceType";
+    constexpr const char* deviceTypeName = "DeviceType";
     bool multiFunc;
     error = isMultiFunction(clientAddr, bus, dev, multiFunc);
     if (error != resCode::resOk)
@@ -546,7 +546,7 @@ static resCode setPCIeDeviceProperties(const int& clientAddr, const int& bus,
     }
 
     // Set PCIe Generation
-    constexpr char const* generationInUseName = "GenerationInUse";
+    constexpr const char* generationInUseName = "GenerationInUse";
     std::string generationInUse;
     error = getGenerationInUse(clientAddr, bus, dev, generationInUse);
     if (error == resCode::resErr)
@@ -875,18 +875,18 @@ static void waitForOSStandbyDelay(boost::asio::io_context& io,
 
     osStandbyTimer.async_wait(
         [&io, &objServer, &cpuInfo](const boost::system::error_code& ec) {
-            if (ec == boost::asio::error::operation_aborted)
-            {
-                return; // we're being canceled
-            }
-            else if (ec)
-            {
-                std::cerr << "OS Standby async_wait failed: " << ec.value()
-                          << ": " << ec.message() << "\n";
-                return;
-            }
-            startPCIeScan(io, objServer, cpuInfo);
-        });
+        if (ec == boost::asio::error::operation_aborted)
+        {
+            return; // we're being canceled
+        }
+        else if (ec)
+        {
+            std::cerr << "OS Standby async_wait failed: " << ec.value() << ": "
+                      << ec.message() << "\n";
+            return;
+        }
+        startPCIeScan(io, objServer, cpuInfo);
+    });
 }
 
 static void monitorOSStandby(boost::asio::io_context& io,
@@ -904,42 +904,41 @@ static void monitorOSStandby(boost::asio::io_context& io,
         "Status'",
         [&io, &objServer, &osStandbyTimer,
          &cpuInfo](sdbusplus::message_t& msg) {
-            // Get the OS State from the message
-            std::string osStateInterface;
-            boost::container::flat_map<std::string, std::variant<std::string>>
-                propertiesChanged;
-            msg.read(osStateInterface, propertiesChanged);
+        // Get the OS State from the message
+        std::string osStateInterface;
+        boost::container::flat_map<std::string, std::variant<std::string>>
+            propertiesChanged;
+        msg.read(osStateInterface, propertiesChanged);
 
-            for (const auto& [name, value] : propertiesChanged)
+        for (const auto& [name, value] : propertiesChanged)
+        {
+            if (name == "OperatingSystemState")
             {
-                if (name == "OperatingSystemState")
+                const std::string* state = std::get_if<std::string>(&value);
+                if (state == nullptr)
                 {
-                    const std::string* state = std::get_if<std::string>(&value);
-                    if (state == nullptr)
-                    {
-                        std::cerr << "Unable to read OS state value\n";
-                        return;
-                    }
-                    // Note: Short version of OperatingSystemState value is
-                    // deprecated and would be removed in the future
-                    if ((*state == "Standby") ||
-                        (*state == "xyz.openbmc_project.State.OperatingSystem."
-                                   "Status.OSStatus.Standby"))
-                    {
-                        peci_pcie::abortScan = false;
-                        waitForOSStandbyDelay(io, objServer, osStandbyTimer,
-                                              cpuInfo);
-                    }
-                    else if ((*state == "Inactive") ||
-                             (*state ==
-                              "xyz.openbmc_project.State.OperatingSystem."
-                              "Status.OSStatus.Inactive"))
-                    {
-                        peci_pcie::abortScan = true;
-                        osStandbyTimer.cancel();
-                    }
+                    std::cerr << "Unable to read OS state value\n";
+                    return;
+                }
+                // Note: Short version of OperatingSystemState value is
+                // deprecated and would be removed in the future
+                if ((*state == "Standby") ||
+                    (*state == "xyz.openbmc_project.State.OperatingSystem."
+                               "Status.OSStatus.Standby"))
+                {
+                    peci_pcie::abortScan = false;
+                    waitForOSStandbyDelay(io, objServer, osStandbyTimer,
+                                          cpuInfo);
+                }
+                else if ((*state == "Inactive") ||
+                         (*state == "xyz.openbmc_project.State.OperatingSystem."
+                                    "Status.OSStatus.Inactive"))
+                {
+                    peci_pcie::abortScan = true;
+                    osStandbyTimer.cancel();
                 }
             }
+        }
         });
 
     // Check if the OS state is already available
@@ -947,30 +946,30 @@ static void monitorOSStandby(boost::asio::io_context& io,
         [&io, &objServer, &osStandbyTimer,
          &cpuInfo](boost::system::error_code ec,
                    const std::variant<std::string>& property) {
-            if (ec)
-            {
-                std::cerr << "error with OS state async_method_call\n";
-                return;
-            }
+        if (ec)
+        {
+            std::cerr << "error with OS state async_method_call\n";
+            return;
+        }
 
-            const std::string* state = std::get_if<std::string>(&property);
-            if (state == nullptr)
-            {
-                std::cerr << "Unable to read OS state value\n";
-                return;
-            }
+        const std::string* state = std::get_if<std::string>(&property);
+        if (state == nullptr)
+        {
+            std::cerr << "Unable to read OS state value\n";
+            return;
+        }
 
-            // If the OS state is in Standby, then BIOS is done and we can
-            // continue.  Otherwise, we just wait for the match
-            // Note: Short version of OperatingSystemState value is deprecated
-            // and would be removed in the future
+        // If the OS state is in Standby, then BIOS is done and we can
+        // continue.  Otherwise, we just wait for the match
+        // Note: Short version of OperatingSystemState value is deprecated
+        // and would be removed in the future
 
-            if ((*state == "Standby") ||
-                (*state == "xyz.openbmc_project.State.OperatingSystem.Status."
-                           "OSStatus.Standby"))
-            {
-                waitForOSStandbyDelay(io, objServer, osStandbyTimer, cpuInfo);
-            }
+        if ((*state == "Standby") ||
+            (*state == "xyz.openbmc_project.State.OperatingSystem.Status."
+                       "OSStatus.Standby"))
+        {
+            waitForOSStandbyDelay(io, objServer, osStandbyTimer, cpuInfo);
+        }
         },
         "xyz.openbmc_project.State.OperatingSystem",
         "/xyz/openbmc_project/state/os", "org.freedesktop.DBus.Properties",

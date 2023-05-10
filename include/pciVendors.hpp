@@ -17,7 +17,7 @@
 #pragma once
 #include <boost/container/flat_map.hpp>
 
-static constexpr char const* otherVendor = "Other";
+static constexpr const char* otherVendor = "Other";
 
 // This list of Vendors is extracted from the PCI-SIG member-companies page
 // ('https://pcisig.com/membership/member-companies') using

@@ -22,10 +22,10 @@
 
 namespace peci_pcie
 {
-static constexpr char const* peciPCIeObject = "xyz.openbmc_project.PCIe";
-static constexpr char const* peciPCIePath =
+static constexpr const char* peciPCIeObject = "xyz.openbmc_project.PCIe";
+static constexpr const char* peciPCIePath =
     "/xyz/openbmc_project/inventory/pcie";
-static constexpr char const* peciPCIeDeviceInterface =
+static constexpr const char* peciPCIeDeviceInterface =
     "xyz.openbmc_project.Inventory.Item.PCIeDevice";
 
 static constexpr const int maxPCIBuses = 256;
