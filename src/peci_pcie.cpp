@@ -589,8 +589,23 @@ static resCode updatePCIeDevice(const int& clientAddr, const int& bus,
         return resCode::resErr;
     }
 
+    int maxPCIFunctions = peci_pcie::maxPCIFunctions;
+    bool multiFunc = true;
+    if (isMultiFunction(clientAddr, bus, dev, multiFunc) != resCode::resOk)
+    {
+        std::cout << "Error checking multifunction for " << bus << " " << dev << '\n';
+    }
+    else 
+    {
+        if (!multiFunc)
+        {
+            // Single function device. Access only function 0
+            maxPCIFunctions = 1;
+        }
+    }
+
     // Walk through and populate the functions for this device
-    for (int func = 0; func < peci_pcie::maxPCIFunctions; func++)
+    for (int func = 0; func < maxPCIFunctions; func++)
     {
         bool res;
         resCode error = pcieFunctionExists(clientAddr, bus, dev, func, res);
