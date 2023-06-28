@@ -66,6 +66,9 @@ add_definitions (-DBOOST_ASIO_DISABLE_THREADS)
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
 set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-rtti")
 
+find_package (PkgConfig REQUIRED)
+pkg_get_variable(SYSTEMD_SYSTEM_UNIT_DIR systemd systemdsystemunitdir)
+
 set (SERVICE_FILES
      ${PROJECT_SOURCE_DIR}/service_files/xyz.openbmc_project.PCIe.service)
-install (FILES ${SERVICE_FILES} DESTINATION /lib/systemd/system/)
+install (FILES ${SERVICE_FILES} DESTINATION "${SYSTEMD_SYSTEM_UNIT_DIR}")
