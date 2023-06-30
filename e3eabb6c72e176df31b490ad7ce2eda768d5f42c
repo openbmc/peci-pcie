@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4b6b00c0_8e560243",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 592,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2023-06-30T19:52:23Z",
+      "side": 1,
+      "message": "Since the spec indicates that functions greater than 0 should only be accessed on multi-function devices, I think it would be safer to default to a single function here.  Then if there is an error reading the multi-function bit, we default to the safer value.",
+      "revId": "e3eabb6c72e176df31b490ad7ce2eda768d5f42c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df28d993_4853b38c",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 594,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2023-06-30T19:52:23Z",
+      "side": 1,
+      "message": "In other places (such as lines 612 and 620), we simply return if there is an error returned from the function.  Should we just return here, too and simplify the else statement?",
+      "revId": "e3eabb6c72e176df31b490ad7ce2eda768d5f42c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "94245050_87afee60",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 596,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2023-06-30T19:52:23Z",
+      "side": 1,
+      "message": "I\u0027d use `std::cerr` here.",
+      "revId": "e3eabb6c72e176df31b490ad7ce2eda768d5f42c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
