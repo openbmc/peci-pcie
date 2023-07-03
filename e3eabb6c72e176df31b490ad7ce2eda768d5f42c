@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0297407f_421d7941",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 592,
+      "author": {
+        "id": 1000928
+      },
+      "writtenOn": "2023-07-03T05:41:19Z",
+      "side": 1,
+      "message": "Changed",
+      "parentUuid": "4b6b00c0_8e560243",
+      "revId": "e3eabb6c72e176df31b490ad7ce2eda768d5f42c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "df28d993_4853b38c",
         "filename": "src/peci_pcie.cpp",
         "patchSetId": 2
@@ -37,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d8fa920f_ce11e51f",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 594,
+      "author": {
+        "id": 1000928
+      },
+      "writtenOn": "2023-07-03T05:41:19Z",
+      "side": 1,
+      "message": "Returned error",
+      "parentUuid": "df28d993_4853b38c",
+      "revId": "e3eabb6c72e176df31b490ad7ce2eda768d5f42c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "94245050_87afee60",
         "filename": "src/peci_pcie.cpp",
         "patchSetId": 2
@@ -48,6 +84,24 @@
       "writtenOn": "2023-06-30T19:52:23Z",
       "side": 1,
       "message": "I\u0027d use `std::cerr` here.",
+      "revId": "e3eabb6c72e176df31b490ad7ce2eda768d5f42c",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ac188c38_93752559",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 596,
+      "author": {
+        "id": 1000928
+      },
+      "writtenOn": "2023-07-03T05:41:19Z",
+      "side": 1,
+      "message": "Removed",
+      "parentUuid": "94245050_87afee60",
       "revId": "e3eabb6c72e176df31b490ad7ce2eda768d5f42c",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
