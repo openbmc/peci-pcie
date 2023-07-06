@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2d9257dd_59484263",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2023-07-06T19:39:25Z",
+      "side": 1,
+      "message": "Looks good. I left a minor comment to improve efficiency, if desired.",
+      "revId": "c9c724b3dccdd05813737e8688c18f97189d1658",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "283b85eb_0e94d255",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 606,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2023-07-06T19:39:25Z",
+      "side": 1,
+      "message": "nit: Since the error message and return flow changed, I think this can now be simplified to:\n```\nint maxPCIFunctions \u003d multiFunc ? peci_pcie::maxPCIFunctions : 1;\n```",
+      "range": {
+        "startLine": 602,
+        "startChar": 0,
+        "endLine": 606,
+        "endChar": 5
+      },
+      "revId": "c9c724b3dccdd05813737e8688c18f97189d1658",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
