@@ -39,6 +39,30 @@
       },
       "revId": "4d29419f04a390ec856bf483fd5d63128143cafe",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0655493a_0e8eb0dd",
+        "filename": "meson.build",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2023-07-31T19:51:29Z",
+      "side": 1,
+      "message": "I thought I\u0027d need that to run a service file?  I\u0027ll try without it.",
+      "parentUuid": "571f416d_321494bf",
+      "range": {
+        "startLine": 54,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 12
+      },
+      "revId": "4d29419f04a390ec856bf483fd5d63128143cafe",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
