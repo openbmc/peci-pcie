@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dc86dd1d_18135782",
+        "filename": "src/peci_pcie.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 1012,
+      "author": {
+        "id": 1000153
+      },
+      "writtenOn": "2023-07-31T19:48:39Z",
+      "side": 0,
+      "message": "nitpick.\n\nIn other places we\u0027ll generally avoid this by leaving the arguments in place and doing\n\nint main(int /*argc*/, char /*argv*/)\n\nJust to make it clear to readers that you\u0027re ignoring arguments.  Up to you if you want to change, not a big deal",
+      "range": {
+        "startLine": 1012,
+        "startChar": 13,
+        "endLine": 1012,
+        "endChar": 17
+      },
+      "revId": "8b18f526772c96c785a62e3a811eacf24d3b637f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    }
+  ]
+}
