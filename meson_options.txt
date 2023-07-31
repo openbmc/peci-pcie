@@ -1,0 +1,13 @@
+option(
+    'wait-for-os-standby',
+    type: 'feature',
+    value: 'disabled',
+    description: 'Wait for the OS Standby state to indicate that BIOS is complete before starting the PCIe scan',
+)
+
+option(
+    'use-rdendpointcfg',
+    type: 'feature',
+    value: 'disabled',
+    description: 'Use the RdEndpointConfig PECI command to read PCI data',
+)
