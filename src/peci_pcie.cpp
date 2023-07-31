@@ -1015,7 +1015,7 @@ static void waitForOSStandbyDelay(boost::asio::io_context& io,
         "OperatingSystemState");
 }
 
-int main(int /*argc*/, char** /*argv*/)
+int main(int /*argc*/, char* /*argv*/[])
 {
     // setup connection to dbus
     boost::asio::io_context io;
