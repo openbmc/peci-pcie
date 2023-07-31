@@ -149,6 +149,13 @@ static resCode getCPUBusMap(std::vector<CPUInfo>& cpuInfo)
                     cpuBusNum1 >>= 8;
                 }
                 cpu.skipCpuBuses = true;
+                break;
+            }
+            default:
+            {
+                std::cerr << "CPU buses not found for CPU Model: 0x" << std::hex
+                          << static_cast<int>(model) << std::dec << "\n";
+                break;
             }
         }
     }
@@ -314,7 +321,7 @@ static resCode getCapReading(const int& clientAddr, const int& bus,
         }
         nextCapPointer = capAddress + peci_pcie::capPointerOffset;
 
-    } while (capabilityID != compareCapID);
+    } while (capabilityID != static_cast<uint32_t>(compareCapID));
     // Get capability reading.
     error = getDataFromPCIeConfig(clientAddr, bus, dev, 0,
                                   capAddress + offsetAddress, offsetLength,
@@ -332,7 +339,6 @@ static resCode getGenerationInUse(const int& clientAddr, const int& bus,
     static std::unordered_set<uint32_t> linkSpeedSkipMap;
     resCode error;
     std::string res;
-    uint32_t capReading = 0;
 
     // Capability ID 0x10(16) is PCI Express
     constexpr int pcieCapID = 16;
@@ -696,8 +702,7 @@ static bool pcieDeviceInDBusMap(const int& clientAddr, const int& bus,
     return false;
 }
 
-static resCode probePCIeDevice(boost::asio::io_context& io,
-                               sdbusplus::asio::object_server& objServer,
+static resCode probePCIeDevice(sdbusplus::asio::object_server& objServer,
                                size_t addr, int cpu, int bus, int dev)
 {
     bool res;
@@ -751,7 +756,7 @@ static void scanPCIeDevice(boost::asio::io_context& io,
                            std::vector<CPUInfo>& cpuInfo, int cpu, int bus,
                            int dev)
 {
-    if (cpu >= cpuInfo.size())
+    if (cpu >= static_cast<int>(cpuInfo.size()))
     {
         std::cerr << "Request to scan CPU" << cpu
                   << " while CPU array has size " << cpuInfo.size() << "\n";
@@ -767,7 +772,7 @@ static void scanPCIeDevice(boost::asio::io_context& io,
     }
     else
     {
-        if (probePCIeDevice(io, objServer, info.addr, cpu, bus, dev) !=
+        if (probePCIeDevice(objServer, info.addr, cpu, bus, dev) !=
             resCode::resOk)
         {
             std::cerr << "Failed to probe CPU " << cpu << " Bus " << bus
@@ -801,7 +806,7 @@ static void scanNextPCIeDevice(boost::asio::io_context& io,
         {
             // All buses scanned, so move to the next CPU
             bus = 0;
-            if (++cpu >= cpuInfo.size())
+            if (++cpu >= static_cast<int>(cpuInfo.size()))
             {
                 // All CPUs scanned, so we're done
                 peci_pcie::scanInProgress = false;
@@ -921,11 +926,12 @@ static void waitForOSStandbyDelay(boost::asio::io_context& io,
     });
 }
 
-static void monitorOSStandby(boost::asio::io_context& io,
-                             std::shared_ptr<sdbusplus::asio::connection> conn,
-                             sdbusplus::asio::object_server& objServer,
-                             boost::asio::steady_timer& osStandbyTimer,
-                             std::vector<CPUInfo>& cpuInfo)
+[[maybe_unused]] static void
+    monitorOSStandby(boost::asio::io_context& io,
+                     std::shared_ptr<sdbusplus::asio::connection> conn,
+                     sdbusplus::asio::object_server& objServer,
+                     boost::asio::steady_timer& osStandbyTimer,
+                     std::vector<CPUInfo>& cpuInfo)
 {
     std::cerr << "Start OperatingSystemState Monitor\n";
 
@@ -1009,7 +1015,7 @@ static void monitorOSStandby(boost::asio::io_context& io,
         "OperatingSystemState");
 }
 
-int main(int argc, char* argv[])
+int main(int /*argc*/, char /*argv*/)
 {
     // setup connection to dbus
     boost::asio::io_context io;
