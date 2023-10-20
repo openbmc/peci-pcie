@@ -977,7 +977,7 @@ static void waitForOSStandbyDelay(boost::asio::io_context& io,
                 }
             }
         }
-        });
+    });
 
     // Check if the OS state is already available
     conn->async_method_call(
@@ -1008,7 +1008,7 @@ static void waitForOSStandbyDelay(boost::asio::io_context& io,
         {
             waitForOSStandbyDelay(io, objServer, osStandbyTimer, cpuInfo);
         }
-        },
+    },
         "xyz.openbmc_project.State.OperatingSystem",
         "/xyz/openbmc_project/state/os", "org.freedesktop.DBus.Properties",
         "Get", "xyz.openbmc_project.State.OperatingSystem.Status",
