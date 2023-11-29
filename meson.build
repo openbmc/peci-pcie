@@ -12,11 +12,11 @@ project(
   ]
 )
 
-if(get_option('wait-for-os-standby').enabled())
+if(get_option('wait-for-os-standby').allowed())
   add_project_arguments('-DWAIT_FOR_OS_STANDBY', language : 'cpp')
 endif
 
-if(get_option('use-rdendpointcfg').enabled())
+if(get_option('use-rdendpointcfg').allowed())
   add_project_arguments('-DUSE_RDENDPOINTCFG', language : 'cpp')
 endif
 
