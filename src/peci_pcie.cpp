@@ -1009,8 +1009,8 @@ static void waitForOSStandbyDelay(boost::asio::io_context& io,
             waitForOSStandbyDelay(io, objServer, osStandbyTimer, cpuInfo);
         }
     },
-        "xyz.openbmc_project.State.OperatingSystem",
-        "/xyz/openbmc_project/state/os", "org.freedesktop.DBus.Properties",
+        "xyz.openbmc_project.State.Host0",
+        "/xyz/openbmc_project/state/host0", "org.freedesktop.DBus.Properties",
         "Get", "xyz.openbmc_project.State.OperatingSystem.Status",
         "OperatingSystemState");
 }
