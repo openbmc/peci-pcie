@@ -27,6 +27,7 @@
 #include <sdbusplus/bus/match.hpp>
 
 #include <iomanip>
+
 #include <iostream>
 #include <set>
 #include <sstream>
@@ -112,7 +113,7 @@ static resCode getCPUBusMap(std::vector<CPUInfo>& cpuInfo)
 
         switch (model)
         {
-            case skx:
+            case skylake:
             {
                 // Get the assigned CPU bus numbers from CPUBUSNO and CPUBUSNO1
                 // (B(0) D8 F2 offsets CCh and D0h)
