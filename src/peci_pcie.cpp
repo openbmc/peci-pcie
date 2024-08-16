@@ -118,15 +118,15 @@ static resCode getCPUBusMap(std::vector<CPUInfo>& cpuInfo)
                 // (B(0) D8 F2 offsets CCh and D0h)
                 uint32_t cpuBusNum = 0;
                 if (peci_RdPCIConfigLocal(addr, 0, 8, 2, 0xCC, 4,
-                                          (uint8_t*)&cpuBusNum,
-                                          &cc) != PECI_CC_SUCCESS)
+                                          (uint8_t*)&cpuBusNum, &cc) !=
+                    PECI_CC_SUCCESS)
                 {
                     return resCode::resErr;
                 }
                 uint32_t cpuBusNum1 = 0;
                 if (peci_RdPCIConfigLocal(addr, 0, 8, 2, 0xD0, 4,
-                                          (uint8_t*)&cpuBusNum1,
-                                          &cc) != PECI_CC_SUCCESS)
+                                          (uint8_t*)&cpuBusNum1, &cc) !=
+                    PECI_CC_SUCCESS)
                 {
                     return resCode::resErr;
                 }
@@ -174,10 +174,9 @@ static bool isPECIAvailable(void)
     return false;
 }
 
-static resCode getDataFromPCIeConfig(const int& clientAddr, const int& bus,
-                                     const int& dev, const int& func,
-                                     const int& offset, const int& size,
-                                     uint32_t& pciData)
+static resCode getDataFromPCIeConfig(
+    const int& clientAddr, const int& bus, const int& dev, const int& func,
+    const int& offset, const int& size, uint32_t& pciData)
 {
     // PECI RdPCIConfig() currently only supports 4 byte reads, so adjust
     // the offset and size to get the right data
@@ -195,23 +194,25 @@ static resCode getDataFromPCIeConfig(const int& clientAddr, const int& bus,
     for (int index = 0; (index < 15) && (ret == PECI_CC_TIMEOUT); index++)
     {
 #ifdef USE_RDENDPOINTCFG
-        ret = peci_RdEndPointConfigPci(clientAddr,  // CPU Address
-                                       0,           // PCI Seg (use 0 for now)
-                                       bus,         // PCI Bus
-                                       dev,         // PCI Device
-                                       func,        // PCI Function
-                                       pciOffset,   // PCI Offset
-                                       pciReadSize, // PCI Read Size
-                                       data.data(), // PCI Read Data
-                                       &cc);        // PECI Completion Code
+        ret = peci_RdEndPointConfigPci(
+            clientAddr,  // CPU Address
+            0,           // PCI Seg (use 0 for now)
+            bus,         // PCI Bus
+            dev,         // PCI Device
+            func,        // PCI Function
+            pciOffset,   // PCI Offset
+            pciReadSize, // PCI Read Size
+            data.data(), // PCI Read Data
+            &cc);        // PECI Completion Code
 #else
-        ret = peci_RdPCIConfig(clientAddr,  // CPU Address
-                               bus,         // PCI Bus
-                               dev,         // PCI Device
-                               func,        // PCI Function
-                               pciOffset,   // PCI Offset
-                               data.data(), // PCI Read Data
-                               &cc);        // PECI Completion Code
+        ret = peci_RdPCIConfig(
+            clientAddr,  // CPU Address
+            bus,         // PCI Bus
+            dev,         // PCI Device
+            func,        // PCI Function
+            pciOffset,   // PCI Offset
+            data.data(), // PCI Read Data
+            &cc);        // PECI Completion Code
 #endif
         if constexpr (peci_pcie::debug)
         {
@@ -286,10 +287,9 @@ static resCode getDeviceClass(const int& clientAddr, const int& bus,
     return resCode::resOk;
 }
 
-static resCode getCapReading(const int& clientAddr, const int& bus,
-                             const int& dev, uint32_t& capReading,
-                             const int compareCapID, const int offsetAddress,
-                             const int offsetLength)
+static resCode getCapReading(
+    const int& clientAddr, const int& bus, const int& dev, uint32_t& capReading,
+    const int compareCapID, const int offsetAddress, const int offsetLength)
 {
     resCode error;
     uint32_t capAddress = 0;
@@ -480,9 +480,8 @@ static resCode setPCIeProperty(const int& clientAddr, const int& bus,
     return resCode::resOk;
 }
 
-static void setDefaultPCIeFunctionProperties(const int& clientAddr,
-                                             const int& bus, const int& dev,
-                                             const int& func)
+static void setDefaultPCIeFunctionProperties(
+    const int& clientAddr, const int& bus, const int& dev, const int& func)
 {
     // Set the function-specific properties
     for (const auto& [name, offset, size] : peci_pcie::pciConfigInfo)
@@ -657,9 +656,9 @@ static resCode addPCIeDevice(sdbusplus::asio::object_server& objServer,
                              const int& clientAddr, const int& cpu,
                              const int& bus, const int& dev)
 {
-    std::string pathName = std::string(peci_pcie::peciPCIePath) + "/S" +
-                           std::to_string(cpu) + "B" + std::to_string(bus) +
-                           "D" + std::to_string(dev);
+    std::string pathName =
+        std::string(peci_pcie::peciPCIePath) + "/S" + std::to_string(cpu) +
+        "B" + std::to_string(bus) + "D" + std::to_string(dev);
     peci_pcie::PcieInterfaces ifaces;
     ifaces.deviceIface =
         objServer.add_interface(pathName, peci_pcie::peciPCIeDeviceInterface);
@@ -747,10 +746,9 @@ static resCode probePCIeDevice(sdbusplus::asio::object_server& objServer,
     return resCode::resOk;
 }
 
-static void scanNextPCIeDevice(boost::asio::io_context& io,
-                               sdbusplus::asio::object_server& objServer,
-                               std::vector<CPUInfo>& cpuInfo, int cpu, int bus,
-                               int dev);
+static void scanNextPCIeDevice(
+    boost::asio::io_context& io, sdbusplus::asio::object_server& objServer,
+    std::vector<CPUInfo>& cpuInfo, int cpu, int bus, int dev);
 static void scanPCIeDevice(boost::asio::io_context& io,
                            sdbusplus::asio::object_server& objServer,
                            std::vector<CPUInfo>& cpuInfo, int cpu, int bus,
@@ -785,10 +783,9 @@ static void scanPCIeDevice(boost::asio::io_context& io,
     return;
 }
 
-static void scanNextPCIeDevice(boost::asio::io_context& io,
-                               sdbusplus::asio::object_server& objServer,
-                               std::vector<CPUInfo>& cpuInfo, int cpu, int bus,
-                               int dev)
+static void scanNextPCIeDevice(
+    boost::asio::io_context& io, sdbusplus::asio::object_server& objServer,
+    std::vector<CPUInfo>& cpuInfo, int cpu, int bus, int dev)
 {
     if (peci_pcie::abortScan)
     {
@@ -841,10 +838,9 @@ static void startPCIeScan(boost::asio::io_context& io,
     }
 }
 
-static void peciAvailableCheck(boost::asio::steady_timer& peciWaitTimer,
-                               boost::asio::io_context& io,
-                               sdbusplus::asio::object_server& objServer,
-                               std::vector<CPUInfo>& cpuInfo)
+static void peciAvailableCheck(
+    boost::asio::steady_timer& peciWaitTimer, boost::asio::io_context& io,
+    sdbusplus::asio::object_server& objServer, std::vector<CPUInfo>& cpuInfo)
 {
     static bool lastPECIState = false;
     bool peciAvailable = isPECIAvailable();
@@ -902,36 +898,34 @@ static void peciAvailableCheck(boost::asio::steady_timer& peciWaitTimer,
     });
 }
 
-static void waitForOSStandbyDelay(boost::asio::io_context& io,
-                                  sdbusplus::asio::object_server& objServer,
-                                  boost::asio::steady_timer& osStandbyTimer,
-                                  std::vector<CPUInfo>& cpuInfo)
+static void waitForOSStandbyDelay(
+    boost::asio::io_context& io, sdbusplus::asio::object_server& objServer,
+    boost::asio::steady_timer& osStandbyTimer, std::vector<CPUInfo>& cpuInfo)
 {
     osStandbyTimer.expires_after(
         std::chrono::seconds(peci_pcie::osStandbyDelaySeconds));
 
     osStandbyTimer.async_wait(
         [&io, &objServer, &cpuInfo](const boost::system::error_code& ec) {
-        if (ec == boost::asio::error::operation_aborted)
-        {
-            return; // we're being canceled
-        }
-        else if (ec)
-        {
-            std::cerr << "OS Standby async_wait failed: " << ec.value() << ": "
-                      << ec.message() << "\n";
-            return;
-        }
-        startPCIeScan(io, objServer, cpuInfo);
-    });
+            if (ec == boost::asio::error::operation_aborted)
+            {
+                return; // we're being canceled
+            }
+            else if (ec)
+            {
+                std::cerr << "OS Standby async_wait failed: " << ec.value()
+                          << ": " << ec.message() << "\n";
+                return;
+            }
+            startPCIeScan(io, objServer, cpuInfo);
+        });
 }
 
-[[maybe_unused]] static void
-    monitorOSStandby(boost::asio::io_context& io,
-                     std::shared_ptr<sdbusplus::asio::connection> conn,
-                     sdbusplus::asio::object_server& objServer,
-                     boost::asio::steady_timer& osStandbyTimer,
-                     std::vector<CPUInfo>& cpuInfo)
+[[maybe_unused]] static void monitorOSStandby(
+    boost::asio::io_context& io,
+    std::shared_ptr<sdbusplus::asio::connection> conn,
+    sdbusplus::asio::object_server& objServer,
+    boost::asio::steady_timer& osStandbyTimer, std::vector<CPUInfo>& cpuInfo)
 {
     std::cerr << "Start OperatingSystemState Monitor\n";
 
@@ -942,73 +936,74 @@ static void waitForOSStandbyDelay(boost::asio::io_context& io,
         "Status'",
         [&io, &objServer, &osStandbyTimer,
          &cpuInfo](sdbusplus::message_t& msg) {
-        // Get the OS State from the message
-        std::string osStateInterface;
-        boost::container::flat_map<std::string, std::variant<std::string>>
-            propertiesChanged;
-        msg.read(osStateInterface, propertiesChanged);
+            // Get the OS State from the message
+            std::string osStateInterface;
+            boost::container::flat_map<std::string, std::variant<std::string>>
+                propertiesChanged;
+            msg.read(osStateInterface, propertiesChanged);
 
-        for (const auto& [name, value] : propertiesChanged)
-        {
-            if (name == "OperatingSystemState")
+            for (const auto& [name, value] : propertiesChanged)
             {
-                const std::string* state = std::get_if<std::string>(&value);
-                if (state == nullptr)
+                if (name == "OperatingSystemState")
                 {
-                    std::cerr << "Unable to read OS state value\n";
-                    return;
-                }
-                // Note: Short version of OperatingSystemState value is
-                // deprecated and would be removed in the future
-                if ((*state == "Standby") ||
-                    (*state == "xyz.openbmc_project.State.OperatingSystem."
-                               "Status.OSStatus.Standby"))
-                {
-                    peci_pcie::abortScan = false;
-                    waitForOSStandbyDelay(io, objServer, osStandbyTimer,
-                                          cpuInfo);
-                }
-                else if ((*state == "Inactive") ||
-                         (*state == "xyz.openbmc_project.State.OperatingSystem."
-                                    "Status.OSStatus.Inactive"))
-                {
-                    peci_pcie::abortScan = true;
-                    osStandbyTimer.cancel();
+                    const std::string* state = std::get_if<std::string>(&value);
+                    if (state == nullptr)
+                    {
+                        std::cerr << "Unable to read OS state value\n";
+                        return;
+                    }
+                    // Note: Short version of OperatingSystemState value is
+                    // deprecated and would be removed in the future
+                    if ((*state == "Standby") ||
+                        (*state == "xyz.openbmc_project.State.OperatingSystem."
+                                   "Status.OSStatus.Standby"))
+                    {
+                        peci_pcie::abortScan = false;
+                        waitForOSStandbyDelay(io, objServer, osStandbyTimer,
+                                              cpuInfo);
+                    }
+                    else if ((*state == "Inactive") ||
+                             (*state ==
+                              "xyz.openbmc_project.State.OperatingSystem."
+                              "Status.OSStatus.Inactive"))
+                    {
+                        peci_pcie::abortScan = true;
+                        osStandbyTimer.cancel();
+                    }
                 }
             }
-        }
-    });
+        });
 
     // Check if the OS state is already available
     conn->async_method_call(
         [&io, &objServer, &osStandbyTimer,
          &cpuInfo](boost::system::error_code ec,
                    const std::variant<std::string>& property) {
-        if (ec)
-        {
-            std::cerr << "error with OS state async_method_call\n";
-            return;
-        }
+            if (ec)
+            {
+                std::cerr << "error with OS state async_method_call\n";
+                return;
+            }
 
-        const std::string* state = std::get_if<std::string>(&property);
-        if (state == nullptr)
-        {
-            std::cerr << "Unable to read OS state value\n";
-            return;
-        }
+            const std::string* state = std::get_if<std::string>(&property);
+            if (state == nullptr)
+            {
+                std::cerr << "Unable to read OS state value\n";
+                return;
+            }
 
-        // If the OS state is in Standby, then BIOS is done and we can
-        // continue.  Otherwise, we just wait for the match
-        // Note: Short version of OperatingSystemState value is deprecated
-        // and would be removed in the future
+            // If the OS state is in Standby, then BIOS is done and we can
+            // continue.  Otherwise, we just wait for the match
+            // Note: Short version of OperatingSystemState value is deprecated
+            // and would be removed in the future
 
-        if ((*state == "Standby") ||
-            (*state == "xyz.openbmc_project.State.OperatingSystem.Status."
-                       "OSStatus.Standby"))
-        {
-            waitForOSStandbyDelay(io, objServer, osStandbyTimer, cpuInfo);
-        }
-    },
+            if ((*state == "Standby") ||
+                (*state == "xyz.openbmc_project.State.OperatingSystem.Status."
+                           "OSStatus.Standby"))
+            {
+                waitForOSStandbyDelay(io, objServer, osStandbyTimer, cpuInfo);
+            }
+        },
         "xyz.openbmc_project.State.Host0", "/xyz/openbmc_project/state/host0",
         "org.freedesktop.DBus.Properties", "Get",
         "xyz.openbmc_project.State.OperatingSystem.Status",
