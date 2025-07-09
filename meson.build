@@ -23,7 +23,7 @@ endif
 sdbusplus = dependency('sdbusplus')
 
 systemd = dependency('systemd', required: true)
-systemd_system_unit_dir = systemd.get_variable(pkgconfig: 'systemdsystemunitdir')
+systemd_system_unit_dir = systemd.get_variable(pkgconfig: 'systemd_system_unit_dir')
 
 peci = dependency('libpeci')
 
