@@ -559,11 +559,15 @@ static resCode setPCIeDeviceProperties(const int& clientAddr, const int& bus,
     }
     if (multiFunc)
     {
-        setPCIeProperty(clientAddr, bus, dev, deviceTypeName, "MultiFunction");
+        setPCIeProperty(
+            clientAddr, bus, dev, deviceTypeName,
+            "xyz.openbmc_project.Inventory.Item.PCIeDevice.DeviceTypes.MultiFunction");
     }
     else
     {
-        setPCIeProperty(clientAddr, bus, dev, deviceTypeName, "SingleFunction");
+        setPCIeProperty(
+            clientAddr, bus, dev, deviceTypeName,
+            "xyz.openbmc_project.Inventory.Item.PCIeDevice.DeviceTypes.SingleFunction");
     }
 
     // Set PCIe Generation
