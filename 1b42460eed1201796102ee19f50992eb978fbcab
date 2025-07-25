@@ -16,6 +16,24 @@
       "message": "Looks good to me.  You will need to check if a change in either IPMI or Redfish will be required to handle this change.  I\u0027ll leave it at +1 for a bit to give others a chance to provide feedback before promoting to +2.",
       "revId": "1b42460eed1201796102ee19f50992eb978fbcab",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "245b95fe_1cdacb36",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1001198
+      },
+      "writtenOn": "2025-07-25T07:12:57Z",
+      "side": 1,
+      "message": "Current;y, the bmcweb does not support \"DeviceType\" property, this change does impact to bmcweb. The ipmid does have any commands to access PCIe inventory.\n\nThis change does not impact to any repo. It is safe to merge",
+      "parentUuid": "74337170_fb617ee7",
+      "revId": "1b42460eed1201796102ee19f50992eb978fbcab",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
