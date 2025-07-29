@@ -34,6 +34,23 @@
       "parentUuid": "74337170_fb617ee7",
       "revId": "1b42460eed1201796102ee19f50992eb978fbcab",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5d45e5d0_1bb2d906",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000276
+      },
+      "writtenOn": "2025-07-29T14:34:31Z",
+      "side": 1,
+      "message": "No other feedback. Promote to +2.",
+      "revId": "1b42460eed1201796102ee19f50992eb978fbcab",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ]
 }
