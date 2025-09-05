@@ -1,6 +1,7 @@
 {
   "comments": [
     {
+      "unresolved": true,
       "key": {
         "uuid": "9acf27d8_33a2782b",
         "filename": "src/pci_ids.cpp",
@@ -14,10 +15,10 @@
       "side": 1,
       "message": "I think boost::flat_map is preferred for efficiency.",
       "revId": "0c87250226f287101d6e44bb2aae5f73a63b6cf0",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "d9eb4f79_95341004",
         "filename": "src/pci_ids.cpp",
@@ -32,10 +33,10 @@
       "message": "It generally not so big to have any performance difference: this map only cache entries for devices found in the system. I believe we will have not more then ~10 entries for each.",
       "parentUuid": "9acf27d8_33a2782b",
       "revId": "0c87250226f287101d6e44bb2aae5f73a63b6cf0",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "ed8d7094_f0a75b36",
         "filename": "src/pci_ids.cpp",
@@ -50,10 +51,10 @@
       "message": "flat_map uses less memory because values are packed and there is no per-key overhead.\n\nThey\u0027re generally a good fit for things like this which are write-once read many in a limited environment (ie the BMC)",
       "parentUuid": "d9eb4f79_95341004",
       "revId": "0c87250226f287101d6e44bb2aae5f73a63b6cf0",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "2de673d4_a3bf9680",
         "filename": "src/pci_ids.cpp",
@@ -73,10 +74,10 @@
         "endChar": 10
       },
       "revId": "0c87250226f287101d6e44bb2aae5f73a63b6cf0",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "f96fab47_a231b984",
         "filename": "src/pci_ids.cpp",
@@ -97,10 +98,10 @@
         "endChar": 10
       },
       "revId": "0c87250226f287101d6e44bb2aae5f73a63b6cf0",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "7a23e0f9_1e3063c8",
         "filename": "src/pci_ids.cpp",
@@ -120,10 +121,10 @@
         "endChar": 24
       },
       "revId": "0c87250226f287101d6e44bb2aae5f73a63b6cf0",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "aa07f140_04a2e720",
         "filename": "src/pci_ids.cpp",
@@ -144,10 +145,10 @@
         "endChar": 24
       },
       "revId": "0c87250226f287101d6e44bb2aae5f73a63b6cf0",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "da0fe2e0_61680cf6",
         "filename": "src/pci_ids.cpp",
@@ -168,10 +169,10 @@
         "endChar": 24
       },
       "revId": "0c87250226f287101d6e44bb2aae5f73a63b6cf0",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "441d54ab_d46ecc15",
         "filename": "src/pci_ids.cpp",
@@ -191,10 +192,10 @@
         "endChar": 39
       },
       "revId": "0c87250226f287101d6e44bb2aae5f73a63b6cf0",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "e5f85ac1_439e36ff",
         "filename": "src/pci_ids.cpp",
@@ -215,10 +216,10 @@
         "endChar": 39
       },
       "revId": "0c87250226f287101d6e44bb2aae5f73a63b6cf0",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "7fe2bc38_5dbcd650",
         "filename": "src/pci_ids.cpp",
@@ -239,10 +240,10 @@
         "endChar": 39
       },
       "revId": "0c87250226f287101d6e44bb2aae5f73a63b6cf0",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "07b04577_dedd4df5",
         "filename": "src/pci_ids.cpp",
@@ -262,10 +263,10 @@
         "endChar": 10
       },
       "revId": "0c87250226f287101d6e44bb2aae5f73a63b6cf0",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "a26264ad_6667f0f6",
         "filename": "src/pci_ids.cpp",
@@ -286,10 +287,10 @@
         "endChar": 10
       },
       "revId": "0c87250226f287101d6e44bb2aae5f73a63b6cf0",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "b45cda29_d2a313c9",
         "filename": "src/pci_ids.cpp",
@@ -309,10 +310,10 @@
         "endChar": 38
       },
       "revId": "0c87250226f287101d6e44bb2aae5f73a63b6cf0",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "e5b44f06_1d3d4f67",
         "filename": "src/pci_ids.cpp",
@@ -333,10 +334,10 @@
         "endChar": 38
       },
       "revId": "0c87250226f287101d6e44bb2aae5f73a63b6cf0",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "cc424fb4_87400d33",
         "filename": "src/pci_ids.cpp",
@@ -357,10 +358,10 @@
         "endChar": 38
       },
       "revId": "0c87250226f287101d6e44bb2aae5f73a63b6cf0",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "35335009_3c977093",
         "filename": "src/pci_ids.cpp",
@@ -381,10 +382,10 @@
         "endChar": 38
       },
       "revId": "0c87250226f287101d6e44bb2aae5f73a63b6cf0",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "c5b11541_fe11c325",
         "filename": "src/pci_ids.cpp",
@@ -404,10 +405,10 @@
         "endChar": 12
       },
       "revId": "0c87250226f287101d6e44bb2aae5f73a63b6cf0",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "a7aff2ab_aeb8d2bc",
         "filename": "src/pci_ids.cpp",
@@ -428,8 +429,8 @@
         "endChar": 12
       },
       "revId": "0c87250226f287101d6e44bb2aae5f73a63b6cf0",
-      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4",
-      "unresolved": true
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
-  ]
+  ],
+  "submitRequirementResults": []
 }
