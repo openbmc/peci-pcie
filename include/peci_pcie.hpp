@@ -29,6 +29,12 @@ static constexpr const char* peciPCIeDeviceInterface =
     "xyz.openbmc_project.Inventory.Item.PCIeDevice";
 static constexpr const char* peciPCIeAssetInterface =
     "xyz.openbmc_project.Inventory.Decorator.Asset";
+static constexpr const char* peciPCIeFunctionInterface =
+    "xyz.openbmc_project.Inventory.Item.PCIeFunction";
+static constexpr const char* deviceClassPrefix =
+    "xyz.openbmc_project.Inventory.Item.PCIeFunction.DeviceClasses.";
+static constexpr const char* functionTypePrefix =
+    "xyz.openbmc_project.Inventory.Item.PCIeFunction.FunctionTypes.";
 
 static constexpr const int maxPCIBuses = 256;
 static constexpr const int maxPCIDevices = 32;

@@ -26,10 +26,7 @@
 #include <sdbusplus/asio/object_server.hpp>
 #include <sdbusplus/bus/match.hpp>
 
-#include <iomanip>
 #include <iostream>
-#include <set>
-#include <sstream>
 #include <unordered_set>
 
 namespace peci_pcie
@@ -39,6 +36,10 @@ struct PcieInterfaces
 {
     std::shared_ptr<sdbusplus::asio::dbus_interface> deviceIface;
     std::shared_ptr<sdbusplus::asio::dbus_interface> assetIface;
+    boost::container::flat_map<int,
+                               std::shared_ptr<sdbusplus::asio::dbus_interface>>
+        functionIfaces;
+    std::string path;
 };
 
 static boost::container::flat_map<
@@ -51,28 +52,6 @@ static bool scanInProgress;
 
 constexpr const bool debug = false;
 
-namespace function
-{
-static constexpr const char* functionTypeName = "FunctionType";
-static constexpr const char* deviceClassName = "DeviceClass";
-static constexpr const char* vendorIdName = "VendorId";
-static constexpr const char* deviceIdName = "DeviceId";
-static constexpr const char* classCodeName = "ClassCode";
-static constexpr const char* revisionIdName = "RevisionId";
-static constexpr const char* subsystemIdName = "SubsystemId";
-static constexpr const char* subsystemVendorIdName = "SubsystemVendorId";
-} // namespace function
-
-static constexpr const std::array pciConfigInfo{
-    std::tuple<const char*, int, int>{function::functionTypeName, -1, -1},
-    std::tuple<const char*, int, int>{function::deviceClassName, -1, -1},
-    std::tuple<const char*, int, int>{function::vendorIdName, 0, 2},
-    std::tuple<const char*, int, int>{function::deviceIdName, 2, 2},
-    std::tuple<const char*, int, int>{function::classCodeName, 9, 3},
-    std::tuple<const char*, int, int>{function::revisionIdName, 8, 1},
-    std::tuple<const char*, int, int>{function::subsystemIdName, 0x2e, 2},
-    std::tuple<const char*, int, int>{function::subsystemVendorIdName, 0x2c,
-                                      2}};
 } // namespace peci_pcie
 
 enum class resCode
@@ -240,17 +219,6 @@ static resCode getDataFromPCIeConfig(
     return resCode::resOk;
 }
 
-static resCode getStringFromData(const int& size, const uint32_t& data,
-                                 std::string& res)
-{
-    // And convert it to a string
-    std::stringstream dataStream;
-    dataStream << "0x" << std::hex << std::setfill('0') << std::setw(size * 2)
-               << data;
-    res = dataStream.str();
-    return resCode::resOk;
-}
-
 static resCode getVendorName(const int& clientAddr, const int& bus,
                              const int& dev, std::string& res)
 {
@@ -266,24 +234,6 @@ static resCode getVendorName(const int& clientAddr, const int& bus,
     }
     // Get the vendor name or use Other if it doesn't exist
     res = pciVendors.try_emplace(vendorID, otherVendor).first->second;
-    return resCode::resOk;
-}
-
-static resCode getDeviceClass(const int& clientAddr, const int& bus,
-                              const int& dev, const int& func, std::string& res)
-{
-    static constexpr const int baseClassOffset = 0x0b;
-    static constexpr const int baseClassSize = 1;
-
-    // Get the Device Base Class
-    uint32_t baseClass = 0;
-    if (getDataFromPCIeConfig(clientAddr, bus, dev, func, baseClassOffset,
-                              baseClassSize, baseClass) != resCode::resOk)
-    {
-        return resCode::resErr;
-    }
-    // Get the base class name or use Other if it doesn't exist
-    res = pciDeviceClasses.try_emplace(baseClass, otherClass).first->second;
     return resCode::resOk;
 }
 
@@ -480,60 +430,101 @@ static resCode setPCIeProperty(const int& clientAddr, const int& bus,
     return resCode::resOk;
 }
 
-static void setDefaultPCIeFunctionProperties(
-    const int& clientAddr, const int& bus, const int& dev, const int& func)
+static resCode createOrUpdatePCIeFunction(
+    sdbusplus::asio::object_server& objServer, const int& clientAddr,
+    const int& bus, const int& dev, const int& func)
 {
-    // Set the function-specific properties
-    for (const auto& [name, offset, size] : peci_pcie::pciConfigInfo)
+    // Read VendorId and DeviceId (offset 0x00, 4 bytes)
+    uint32_t idData = 0;
+    if (getDataFromPCIeConfig(clientAddr, bus, dev, func, 0x00, 4, idData) !=
+        resCode::resOk)
     {
-        setPCIeProperty(clientAddr, bus, dev,
-                        "Function" + std::to_string(func) + std::string(name),
-                        std::string());
+        return resCode::resErr;
     }
-}
+    uint16_t vendorId = static_cast<uint16_t>(idData & 0xFFFF);
+    uint16_t deviceId = static_cast<uint16_t>((idData >> 16) & 0xFFFF);
 
-static resCode setPCIeFunctionProperties(const int& clientAddr, const int& bus,
-                                         const int& dev, const int& func)
-{
-    uint32_t data = 0;
-    std::string res;
-    resCode error;
-
-    for (const auto& [name, offset, size] : peci_pcie::pciConfigInfo)
+    // Read RevisionId + Class Code fields (offset 0x08, 4 bytes)
+    // Byte 0x08: RevisionId, 0x09: ProgrammingInterface,
+    // 0x0A: SubClassCode, 0x0B: BaseClassCode
+    uint32_t classData = 0;
+    if (getDataFromPCIeConfig(clientAddr, bus, dev, func, 0x08, 4, classData) !=
+        resCode::resOk)
     {
-        if (offset < 0)
-        {
-            continue;
-        }
-
-        error = getDataFromPCIeConfig(clientAddr, bus, dev, func, offset, size,
-                                      data);
-        if (error != resCode::resOk)
-        {
-            return error;
-        }
-        getStringFromData(size, data, res);
-        setPCIeProperty(clientAddr, bus, dev,
-                        "Function" + std::to_string(func) + std::string(name),
-                        res);
+        return resCode::resErr;
     }
+    uint8_t revisionId = static_cast<uint8_t>(classData & 0xFF);
+    uint8_t progIface = static_cast<uint8_t>((classData >> 8) & 0xFF);
+    uint8_t subClassCode = static_cast<uint8_t>((classData >> 16) & 0xFF);
+    uint8_t baseClassCode = static_cast<uint8_t>((classData >> 24) & 0xFF);
 
-    // Set the function type always to physical for now
-    setPCIeProperty(clientAddr, bus, dev,
-                    "Function" + std::to_string(func) +
-                        std::string(peci_pcie::function::functionTypeName),
-                    "Physical");
-
-    // Set the function Device Class
-    error = getDeviceClass(clientAddr, bus, dev, func, res);
-    if (error != resCode::resOk)
+    // Read SubsystemVendorId and SubsystemId (offset 0x2C, 4 bytes)
+    uint32_t subsysData = 0;
+    if (getDataFromPCIeConfig(clientAddr, bus, dev, func, 0x2C, 4,
+                              subsysData) != resCode::resOk)
     {
-        return error;
+        return resCode::resErr;
     }
-    setPCIeProperty(clientAddr, bus, dev,
-                    "Function" + std::to_string(func) +
-                        std::string(peci_pcie::function::deviceClassName),
-                    res);
+    uint16_t subsysVendorId = static_cast<uint16_t>(subsysData & 0xFFFF);
+    uint16_t subsysId = static_cast<uint16_t>((subsysData >> 16) & 0xFFFF);
+
+    // Derive DeviceClass enum string from base class code
+    std::string deviceClassName =
+        pciDeviceClasses
+            .try_emplace(static_cast<int>(baseClassCode), otherClass)
+            .first->second;
+    std::string deviceClassEnum =
+        std::string(peci_pcie::deviceClassPrefix) + deviceClassName;
+
+    // FunctionType is always Physical for now
+    std::string functionTypeEnum =
+        std::string(peci_pcie::functionTypePrefix) + "Physical";
+
+    auto& ifaces = peci_pcie::pcieDeviceDBusMap[clientAddr][bus][dev];
+    auto funcIt = ifaces.functionIfaces.find(func);
+
+    if (funcIt != ifaces.functionIfaces.end() &&
+        funcIt->second->is_initialized())
+    {
+        // Update existing function object
+        auto& funcIface = funcIt->second;
+        funcIface->set_property("VendorId", vendorId);
+        funcIface->set_property("DeviceId", deviceId);
+        funcIface->set_property("RevisionId", revisionId);
+        funcIface->set_property("BaseClassCode", baseClassCode);
+        funcIface->set_property("SubClassCode", subClassCode);
+        funcIface->set_property("ProgrammingInterface", progIface);
+        funcIface->set_property("SubsystemVendorId", subsysVendorId);
+        funcIface->set_property("SubsystemId", subsysId);
+        funcIface->set_property("DeviceClass", deviceClassEnum);
+        funcIface->set_property("FunctionType", functionTypeEnum);
+    }
+    else
+    {
+        // Create new function D-Bus object
+        std::string funcPath = ifaces.path + "/Function" + std::to_string(func);
+        auto funcIface = objServer.add_interface(
+            funcPath, peci_pcie::peciPCIeFunctionInterface);
+
+        funcIface->register_property("BusNumber", static_cast<uint8_t>(bus));
+        funcIface->register_property("DeviceNumber", static_cast<uint8_t>(dev));
+        funcIface->register_property("FunctionNumber",
+                                     static_cast<uint8_t>(func));
+        funcIface->register_property("VendorId", vendorId);
+        funcIface->register_property("DeviceId", deviceId);
+        funcIface->register_property("RevisionId", revisionId);
+        funcIface->register_property("BaseClassCode", baseClassCode);
+        funcIface->register_property("SubClassCode", subClassCode);
+        funcIface->register_property("ProgrammingInterface", progIface);
+        funcIface->register_property("SubsystemVendorId", subsysVendorId);
+        funcIface->register_property("SubsystemId", subsysId);
+        funcIface->register_property("DeviceClass", deviceClassEnum);
+        funcIface->register_property("FunctionType", functionTypeEnum);
+
+        funcIface->initialize();
+        ifaces.functionIfaces[func] = funcIface;
+    }
+
     return resCode::resOk;
 }
 
@@ -590,7 +581,8 @@ static resCode setPCIeDeviceProperties(const int& clientAddr, const int& bus,
     return resCode::resOk;
 }
 
-static resCode updatePCIeDevice(const int& clientAddr, const int& bus,
+static resCode updatePCIeDevice(sdbusplus::asio::object_server& objServer,
+                                const int& clientAddr, const int& bus,
                                 const int& dev)
 {
     if (setPCIeDeviceProperties(clientAddr, bus, dev) != resCode::resOk)
@@ -608,6 +600,9 @@ static resCode updatePCIeDevice(const int& clientAddr, const int& bus,
     // devices
     int maxPCIFunctions = multiFunc ? peci_pcie::maxPCIFunctions : 1;
 
+    // Track which functions exist in this scan
+    boost::container::flat_set<int> existingFunctions;
+
     // Walk through and populate the functions for this device
     for (int func = 0; func < maxPCIFunctions; func++)
     {
@@ -619,19 +614,31 @@ static resCode updatePCIeDevice(const int& clientAddr, const int& bus,
         }
         if (res)
         {
-            // Set the properties for this function
-            if (setPCIeFunctionProperties(clientAddr, bus, dev, func) !=
-                resCode::resOk)
+            existingFunctions.insert(func);
+            if (createOrUpdatePCIeFunction(objServer, clientAddr, bus, dev,
+                                           func) != resCode::resOk)
             {
                 return resCode::resErr;
             }
         }
+    }
+
+    // Remove function objects that no longer exist
+    auto& ifaces = peci_pcie::pcieDeviceDBusMap[clientAddr][bus][dev];
+    for (auto it = ifaces.functionIfaces.begin();
+         it != ifaces.functionIfaces.end();)
+    {
+        if (!existingFunctions.contains(it->first))
+        {
+            objServer.remove_interface(it->second);
+            it = ifaces.functionIfaces.erase(it);
+        }
         else
         {
-            // Set default properties for unused functions
-            setDefaultPCIeFunctionProperties(clientAddr, bus, dev, func);
+            ++it;
         }
     }
+
     return resCode::resOk;
 }
 
@@ -639,8 +646,15 @@ static void removePCIeDevice(sdbusplus::asio::object_server& objServer,
                              const int& clientAddr, const int& bus,
                              const int& dev)
 {
-    peci_pcie::PcieInterfaces ifaces =
+    peci_pcie::PcieInterfaces& ifaces =
         peci_pcie::pcieDeviceDBusMap[clientAddr][bus][dev];
+
+    // Remove all function interfaces first
+    for (auto& [funcNum, funcIface] : ifaces.functionIfaces)
+    {
+        objServer.remove_interface(funcIface);
+    }
+    ifaces.functionIfaces.clear();
 
     objServer.remove_interface(ifaces.deviceIface);
     objServer.remove_interface(ifaces.assetIface);
@@ -664,6 +678,7 @@ static resCode addPCIeDevice(sdbusplus::asio::object_server& objServer,
         std::string(peci_pcie::peciPCIePath) + "/S" + std::to_string(cpu) +
         "B" + std::to_string(bus) + "D" + std::to_string(dev);
     peci_pcie::PcieInterfaces ifaces;
+    ifaces.path = pathName;
     ifaces.deviceIface =
         objServer.add_interface(pathName, peci_pcie::peciPCIeDeviceInterface);
     ifaces.assetIface =
@@ -671,7 +686,7 @@ static resCode addPCIeDevice(sdbusplus::asio::object_server& objServer,
     peci_pcie::pcieDeviceDBusMap[clientAddr][bus][dev] = ifaces;
 
     // Update the properties for the new device
-    if (updatePCIeDevice(clientAddr, bus, dev) != resCode::resOk)
+    if (updatePCIeDevice(objServer, clientAddr, bus, dev) != resCode::resOk)
     {
         removePCIeDevice(objServer, clientAddr, bus, dev);
         return resCode::resErr;
@@ -719,7 +734,7 @@ static resCode probePCIeDevice(sdbusplus::asio::object_server& objServer,
         if (pcieDeviceInDBusMap(addr, bus, dev))
         {
             // This device is already in D-Bus, so update it
-            if (updatePCIeDevice(addr, bus, dev) != resCode::resOk)
+            if (updatePCIeDevice(objServer, addr, bus, dev) != resCode::resOk)
             {
                 return resCode::resErr;
             }
