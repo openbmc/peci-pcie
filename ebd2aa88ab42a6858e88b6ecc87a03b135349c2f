@@ -1,0 +1,8 @@
+Verified+1: OpenBMC CI <openbmcbump-ci@yahoo.com>
+Code-Review+2: Jason Bills <jason.m.bills@linux.intel.com>
+Submitted-by: Ender <andhsieh@nvidia.com>
+Submitted-at: Thu, 02 Apr 2026 02:34:48 +0000
+Reviewed-on: https://gerrit.openbmc.org/c/openbmc/peci-pcie/+/88784
+Comments-Total: 2
+Project: openbmc/peci-pcie
+Branch: refs/heads/master
