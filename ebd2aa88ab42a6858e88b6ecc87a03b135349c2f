@@ -34,6 +34,24 @@
       "parentUuid": "528e35f6_2a4ab5ee",
       "revId": "ebd2aa88ab42a6858e88b6ecc87a03b135349c2f",
       "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "453d207a_1ed80b2e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1002790
+      },
+      "writtenOn": "2026-04-02T02:48:57Z",
+      "side": 1,
+      "message": "Hi @jason.m.bills@linux.intel.com,\n\nSorry for the follow-up. I couldn\u0027t find the option to set the Topic on the peci-pcie Gerrit page, possibly because the change has already been merged.\n\nRegarding the bmcweb side change, here is the link: https://gerrit.openbmc.org/c/openbmc/bmcweb/+/88129.\n\nI have added you as a reviewer. Please take a look and help with the testing and review whenever you have a chance. Thanks!",
+      "parentUuid": "b13d37c9_e4a08ea4",
+      "revId": "ebd2aa88ab42a6858e88b6ecc87a03b135349c2f",
+      "serverId": "adbd0a64-1f21-4d83-b585-671fe73cb6e4"
     }
   ],
   "submitRequirementResults": []
