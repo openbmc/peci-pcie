@@ -39,6 +39,9 @@ struct PcieInterfaces
     boost::container::flat_map<int,
                                std::shared_ptr<sdbusplus::asio::dbus_interface>>
         functionIfaces;
+    boost::container::flat_map<int,
+                               std::shared_ptr<sdbusplus::asio::dbus_interface>>
+        functionAssocIfaces;
     std::string path;
 };
 
@@ -523,6 +526,17 @@ static resCode createOrUpdatePCIeFunction(
 
         funcIface->initialize();
         ifaces.functionIfaces[func] = funcIface;
+
+        // Create association: Function exposed_by Device
+        using AssociationTuple =
+            std::tuple<std::string, std::string, std::string>;
+        std::vector<AssociationTuple> associations{
+            {"exposed_by", "exposing", ifaces.path}};
+        auto assocIface =
+            objServer.add_interface(funcPath, peci_pcie::associationInterface);
+        assocIface->register_property("Associations", associations);
+        assocIface->initialize();
+        ifaces.functionAssocIfaces[func] = assocIface;
     }
 
     return resCode::resOk;
@@ -625,6 +639,19 @@ static resCode updatePCIeDevice(sdbusplus::asio::object_server& objServer,
 
     // Remove function objects that no longer exist
     auto& ifaces = peci_pcie::pcieDeviceDBusMap[clientAddr][bus][dev];
+    for (auto it = ifaces.functionAssocIfaces.begin();
+         it != ifaces.functionAssocIfaces.end();)
+    {
+        if (!existingFunctions.contains(it->first))
+        {
+            objServer.remove_interface(it->second);
+            it = ifaces.functionAssocIfaces.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
     for (auto it = ifaces.functionIfaces.begin();
          it != ifaces.functionIfaces.end();)
     {
@@ -649,7 +676,12 @@ static void removePCIeDevice(sdbusplus::asio::object_server& objServer,
     peci_pcie::PcieInterfaces& ifaces =
         peci_pcie::pcieDeviceDBusMap[clientAddr][bus][dev];
 
-    // Remove all function interfaces first
+    // Remove all function association and function interfaces
+    for (auto& [funcNum, assocIface] : ifaces.functionAssocIfaces)
+    {
+        objServer.remove_interface(assocIface);
+    }
+    ifaces.functionAssocIfaces.clear();
     for (auto& [funcNum, funcIface] : ifaces.functionIfaces)
     {
         objServer.remove_interface(funcIface);
