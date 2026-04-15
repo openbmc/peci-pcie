@@ -31,6 +31,8 @@ static constexpr const char* peciPCIeAssetInterface =
     "xyz.openbmc_project.Inventory.Decorator.Asset";
 static constexpr const char* peciPCIeFunctionInterface =
     "xyz.openbmc_project.Inventory.Item.PCIeFunction";
+static constexpr const char* associationInterface =
+    "xyz.openbmc_project.Association.Definitions";
 static constexpr const char* deviceClassPrefix =
     "xyz.openbmc_project.Inventory.Item.PCIeFunction.DeviceClasses.";
 static constexpr const char* functionTypePrefix =
