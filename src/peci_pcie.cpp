@@ -980,7 +980,7 @@ static void waitForOSStandbyDelay(
 {
     std::cerr << "Start OperatingSystemState Monitor\n";
 
-    static sdbusplus::bus::match_t osStateMatch(
+    static sdbusplus::match osStateMatch(
         *conn,
         "type='signal',interface='org.freedesktop.DBus.Properties',member='"
         "PropertiesChanged',arg0='xyz.openbmc_project.State.OperatingSystem."
